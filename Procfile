@@ -1,1 +1,1 @@
-web: gunicorn hc-shleemypants.wsgi
+web: gunicorn hc.wsgi
