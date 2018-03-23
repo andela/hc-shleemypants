@@ -9,6 +9,8 @@ static-collected
 static/.DS_Store
 
 local_settings.py
+
 .env
+venv/
 
 .vscode/
