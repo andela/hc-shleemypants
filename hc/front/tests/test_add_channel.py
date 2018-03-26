@@ -49,6 +49,28 @@ class AddChannelTestCase(BaseTestCase):
             r = self.client.get(url)
             self.assertContains(r, frag, status_code=404)
 
+    def test_team_access_works(self):
+        # creating Junior as new user and adding him to team
+        self.junior = User(username="junior", email="junor@younggeeks.com")
+        self.junior.set_password("secret")
+        self.junior.save()
 
+        # allow team access
+        self.profile = Profile(user=self.junior, api_key="thisisawesomesecretkey")
+        self.profile.team_access_allowed = True
+        self.profile.team_name = "GEEKS"
+        self.profile.save()
+
+        self.zachary = User(username="zachary", email="zachary@younggeeks.com")
+        self.zachary.set_password("password")
+        self.zachary.save()
+
+        # Adding zachary to the same team as junior(TEAM GEEKS)
+        self.zachary_profile = Profile(user=self.zachary, api_key="newawesomesupersecurekey")
+        self.zachary_profile.current_team = self.profile
+        self.zachary_profile.save()
+
+        self.assertEqual(True, self.profile.team_access_allowed)
+        self.assertEqual("thisisawesomesecretkey",self.zachary_profile.current_team.api_key)
 ### Test that the team access works
 ### Test that bad kinds don't work
