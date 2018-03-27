@@ -22,7 +22,7 @@ HOST = "localhost"
 SECRET_KEY = "---"
 DEBUG = True
 ALLOWED_HOSTS = ['hc-shleemypants.herokuapp.com']
-DEFAULT_FROM_EMAIL = 'healthchecks@example.org'
+DEFAULT_FROM_EMAIL = 'hc-shleemypants@protonmail.com'
 USE_PAYMENTS = False
 
 
