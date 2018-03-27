@@ -72,5 +72,3 @@ class AddChannelTestCase(BaseTestCase):
 
         self.assertEqual(True, self.profile.team_access_allowed)
         self.assertEqual("thisisawesomesecretkey",self.zachary_profile.current_team.api_key)
-### Test that the team access works
-### Test that bad kinds don't work
