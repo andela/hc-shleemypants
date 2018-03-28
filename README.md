@@ -1,5 +1,11 @@
 # healthchecks
 
+[![Build Status](https://travis-ci.org/andela/hc-shleemypants.svg?branch=feature)](https://travis-ci.org/andela/hc-shleemypants)
+[![Coverage Status](https://coveralls.io/repos/github/andela/hc-shleemypants/badge.svg?branch=feature)](https://coveralls.io/github/andela/hc-shleemypants?branch=feature)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0cd02b9f2f4e40ea98b8f534ab2ca4d5)](https://www.codacy.com/app/MarloneA/hc-shleemypants?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andela/hc-shleemypants&amp;utm_campaign=Badge_Grade)
+
+
+
 ![Screenshot of Welcome page](/stuff/screenshots/welcome.png?raw=true "Welcome Page")
 
 ![Screenshot of My Checks page](/stuff/screenshots/my_checks.png?raw=true "My Checks Page")

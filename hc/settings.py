@@ -13,13 +13,16 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 import warnings
 
+import django_heroku
+import dj_database_url
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 HOST = "localhost"
 SECRET_KEY = "---"
 DEBUG = True
-ALLOWED_HOSTS = []
-DEFAULT_FROM_EMAIL = 'healthchecks@example.org'
+ALLOWED_HOSTS = ['hc-shleemypants.herokuapp.com']
+DEFAULT_FROM_EMAIL = 'hc-shleemypants@protonmail.com'
 USE_PAYMENTS = False
 
 
@@ -82,10 +85,7 @@ TEST_RUNNER = 'hc.api.tests.CustomRunner'
 # Default database engine is SQLite. So one can just check out code,
 # install requirements.txt and do manage.py runserver and it works
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':   './hc.sqlite',
-    }
+    'default': dj_database_url.config()
 }
 
 # You can switch database engine to postgres or mysql using environment
@@ -153,3 +153,6 @@ if os.path.exists(os.path.join(BASE_DIR, "hc/local_settings.py")):
     from .local_settings import *
 else:
     warnings.warn("local_settings.py not found, using defaults")
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
