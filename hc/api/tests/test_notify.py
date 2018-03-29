@@ -224,8 +224,9 @@ class NotifyTestCase(BaseTestCase):
 
     ### Test that the web hooks handle connection errors and error 500s
     @patch("hc.api.transports.requests.request")
-    def test_webhook_test(self, mock_get):
+    def test_webhook_connection_error(self, mock_get):
         self._setup_data("webhook", "http://example")
-        n = mock_get.return_value.status_code = 500
+        resp = mock_get.return_value.status_code 
+        resp = 500
         self.channel.notify(self.check)
-        self.assertTrue(n, "Internal Server Error")
+        self.assertEqual(resp, 500)
