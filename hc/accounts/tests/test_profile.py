@@ -18,8 +18,14 @@ class ProfileTestCase(BaseTestCase):
         self.alice.profile.refresh_from_db()
         token = self.alice.profile.token
         ### Assert that the token is set
+        self.assertFalse(token is None)
 
         ### Assert that the email was sent and check email content
+        self.assertEqual(len(mail.outbox), 1)
+        #check the email subject 
+        self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
+        self.assertIn( 'Here\'s a link to set a password', mail.outbox[0].body)
+        self.assertRedirects(r, "/accounts/set_password_link_sent/")
 
     def test_it_sends_report(self):
         check = Check(name="Test Check", user=self.alice)
