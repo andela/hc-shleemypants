@@ -14,7 +14,9 @@ class SwitchTeamTestCase(BaseTestCase):
         r = self.client.get(url, follow=True)
 
         ### Assert the contents of r
-
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "This belongs to Alice")
+        self.assertRedirects(r, "/checks/")
 
     def test_it_checks_team_membership(self):
         self.client.login(username="charlie@example.org", password="password")
