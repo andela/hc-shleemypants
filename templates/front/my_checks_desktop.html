@@ -1,4 +1,16 @@
 {% load hc_extras humanize %}
+ <ul class="nav nav-tabs" role="tablist">
+                <li class="active">
+                    <a href="#ok" data-toggle="tab">Working </a>
+                </li>
+                <li>
+                    <a href="#unresolved" data-toggle="tab">Unresolved</a>
+                </li>
+
+            </ul>
+
+<div class="tab-content">
+    <div id="ok" class="tab-pane fade in active">
 <table id="checks-table" class="table hidden-xs">
     <tr>
         <th></th>
@@ -116,3 +128,12 @@
     {% endfor %}
 
 </table>
+</div>
+<div id="unresolved" class="tab-pane fade">
+    <h3>These are unresolved items</h3>
+</div>
+
+</div>
+
+
+
