@@ -18,7 +18,7 @@ class AddChannelTestCase(BaseTestCase):
         user = User.objects.get(email='alice@example.org')
 
         self.assertRedirects(r, "/integrations/")
-        assert Channel.objects.count() == 1
+        self.assertEqual(Channel.objects.count(), 1)
         self.assertEqual('alice@example.org', user.email)
 
     def test_it_trims_whitespace(self):
@@ -71,4 +71,4 @@ class AddChannelTestCase(BaseTestCase):
         self.zachary_profile.save()
 
         self.assertEqual(True, self.profile.team_access_allowed)
-        self.assertEqual("thisisawesomesecretkey",self.zachary_profile.current_team.api_key)
+        self.assertEqual("thisisawesomesecretkey", self.zachary_profile.current_team.api_key)
