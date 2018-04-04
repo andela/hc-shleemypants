@@ -17,12 +17,9 @@ class ProfileTestCase(BaseTestCase):
         # profile.token should be set now
         self.alice.profile.refresh_from_db()
         token = self.alice.profile.token
-        ### Assert that the token is set
         self.assertFalse(token is None)
 
-        ### Assert that the email was sent and check email content
         self.assertEqual(len(mail.outbox), 1)
-        #check the email subject 
         self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
         self.assertIn( 'Here\'s a link to set a password', mail.outbox[0].body)
         self.assertRedirects(r, "/accounts/set_password_link_sent/")
@@ -33,7 +30,6 @@ class ProfileTestCase(BaseTestCase):
 
         self.alice.profile.send_report()
 
-        ###Assert that the email was sent and check email content
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn( 'Monthly Report',mail.outbox[0].subject)
         self.assertIn( 'This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
@@ -50,11 +46,8 @@ class ProfileTestCase(BaseTestCase):
         for member in self.alice.profile.member_set.all():
             member_emails.add(member.user.email)
 
-        ### Assert the existence of the member emails
-
         self.assertTrue("frank@example.org" in member_emails)
 
-        ###Assert that the email was sent and check email content
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn( 'alice@example.org invites you to',mail.outbox[0].body)
 
@@ -120,13 +113,11 @@ class ProfileTestCase(BaseTestCase):
         # Expect only Alice's tags
         self.assertNotContains(r, "bobs-tag.svg")
 
-    ### Test it creates and revokes API key
     def test_it_creates_api_key(self):
         self.client.login(username="alice@example.org", password="password")
         #include create_api_key in request
         form = {"create_api_key": "1"}
         r = self.client.post("/accounts/profile/", form)
-        #assert stattus code is 200
         self.assertEqual(r.status_code, 200)
         self.profile.refresh_from_db()
         api_key = self.profile.api_key

@@ -19,7 +19,6 @@ class LoginTestCase(TestCase):
         r = self.client.post("/accounts/login/", form)
         assert r.status_code == 302
 
-        ### Assert that a user was created
         self.assertEqual(User.objects.count(), 1)
         # prove the user is alice
         newuser = User.objects.get(email='alice@example.org')
@@ -30,7 +29,6 @@ class LoginTestCase(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Log in to healthchecks.io')
         self.assertIn('please open the link below', mail.outbox[0].body)
 
-        ### Assert that check is associated with the new user
         check = Check.objects.get(code=check.code)
         self.assertEqual(check.user, newuser)
 
@@ -38,6 +36,4 @@ class LoginTestCase(TestCase):
         self.client.session["bad_link"] = True
         self.client.get("/accounts/login/")
         assert "bad_link" not in self.client.session
-
-        ### Any other tests?
 
