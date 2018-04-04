@@ -14,11 +14,14 @@ class AddPushoverTestCase(BaseTestCase):
 
         params = "pushover_user_key=a&nonce=n&prio=0"
         r = self.client.get("/integrations/add_pushover/?%s" % params)
-        assert r.status_code == 302
+        self.assertEqual(r.status_code, 302)
+        # assert r.status_code == 302
 
         channels = list(Channel.objects.all())
-        assert len(channels) == 1
-        assert channels[0].value == "a|0"
+        self.assertEqual(len(channels), 1)
+        # assert len(channels) == 1
+        self.assertEqual(channels[0].value, "a|0")
+        # assert channels[0].value == "a|0"
 
     @override_settings(PUSHOVER_API_TOKEN=None)
     def test_it_requires_api_token(self):
@@ -35,7 +38,8 @@ class AddPushoverTestCase(BaseTestCase):
 
         params = "pushover_user_key=a&nonce=INVALID&prio=0"
         r = self.client.get("/integrations/add_pushover/?%s" % params)
-        assert r.status_code == 403
+        self.assertEqual(r.status_code, 403)
+        # assert r.status_code == 403
 
     def test_it_validates_priority(self):
         self.client.login(username="alice@example.org", password="password")
@@ -46,4 +50,5 @@ class AddPushoverTestCase(BaseTestCase):
 
         params = "pushover_user_key=a&nonce=INVALID&prio=s"
         r = self.client.get("/integrations/add_pushover/?%s" % params)
-        assert r.status_code == 403
+        self.assertEqual(r.status_code, 403)
+        # assert r.status_code == 403
