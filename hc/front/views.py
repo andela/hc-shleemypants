@@ -47,9 +47,13 @@ def my_checks(request):
             elif check.in_grace_period():
                 grace_tags.add(tag)
 
+    unresolved = [new_check for new_check in checks if new_check.get_status() == "down"]
+    up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new"]
+
     ctx = {
         "page": "checks",
-        "checks": checks,
+        "up": up,
+        "unresolved":unresolved,
         "now": timezone.now(),
         "tags": counter.most_common(),
         "down_tags": down_tags,
