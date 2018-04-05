@@ -34,7 +34,7 @@
     <div class="col-sm-12">
 
 
-    {% if checks %}
+    {% if up or unresolved %}
         {% include "front/my_checks_mobile.html" %}
         {% include "front/my_checks_desktop.html" %}
     {% else %}
