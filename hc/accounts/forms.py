@@ -12,10 +12,18 @@ class EmailPasswordForm(forms.Form):
     email = LowercaseEmailField()
     password = forms.CharField(required=False)
 
+class HorizRadioRenderer(forms.RadioSelect.renderer):
+    """ this overrides widget method to put radio buttons horizontally
+        instead of vertically.
+    """
+    def render(self):
+            """Outputs radios"""
+            return mark_safe(u'\n'.join([u'%s\n' % w for w in self]))
 
 class ReportSettingsForm(forms.Form):
     reports_allowed = forms.BooleanField(required=False)
 
+    reports_freqs = forms.CharField(required=False)
 
 class SetPasswordForm(forms.Form):
     password = forms.CharField()
