@@ -35,6 +35,14 @@
 
 
     {% if up or unresolved %}
+        <ul class="nav nav-tabs" role="tablist">
+                <li class="active">
+                    <a href="#ok" data-toggle="tab">Working </a>
+                </li>
+                <li>
+                    <a href="#unresolved" data-toggle="tab">Unresolved</a>
+                </li>
+            </ul>
         {% include "front/my_checks_mobile.html" %}
         {% include "front/my_checks_desktop.html" %}
     {% else %}
