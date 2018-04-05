@@ -20,7 +20,7 @@ class Profile(models.Model):
     team_access_allowed = models.BooleanField(default=False)
     next_report_date = models.DateTimeField(null=True, blank=True)
     reports_allowed = models.BooleanField(default=True)
-    report_freqs = models.CharField(max_length=50)
+    report_freqs = models.CharField(max_length=50, default="weekly")
     ping_log_limit = models.IntegerField(default=100)
     token = models.CharField(max_length=128, blank=True)
     api_key = models.CharField(max_length=128, blank=True)
@@ -28,9 +28,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.team_name or self.user.email
-
-    def set_report_freq(self, report_freq):
-
 
     def send_instant_login_link(self, inviting_profile=None):
         token = str(uuid.uuid4())
