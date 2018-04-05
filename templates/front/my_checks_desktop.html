@@ -1,13 +1,5 @@
 {% load hc_extras humanize %}
- <ul class="nav nav-tabs" role="tablist">
-                <li class="active">
-                    <a href="#ok" data-toggle="tab">Working </a>
-                </li>
-                <li>
-                    <a href="#unresolved" data-toggle="tab">Unresolved</a>
-                </li>
 
-            </ul>
 
 
 <div class="tab-content">
@@ -138,7 +130,7 @@
     <div class="tab-pane" id="unresolved">
 
     {% if unresolved %}
-                <table id="checks-table unresolved" class="table hidden-xs tab-pane">
+ <table id="checks-table unresolved" class="table hidden-xs tab-pane">
     <tr>
         <th></th>
         <th class="th-name">Name</th>
