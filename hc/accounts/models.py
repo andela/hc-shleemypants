@@ -20,6 +20,7 @@ class Profile(models.Model):
     team_access_allowed = models.BooleanField(default=False)
     next_report_date = models.DateTimeField(null=True, blank=True)
     reports_allowed = models.BooleanField(default=True)
+    report_freqs = models.CharField(max_length=50)
     ping_log_limit = models.IntegerField(default=100)
     token = models.CharField(max_length=128, blank=True)
     api_key = models.CharField(max_length=128, blank=True)
@@ -27,6 +28,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.team_name or self.user.email
+
+    def set_report_freq(self, report_freq):
+
 
     def send_instant_login_link(self, inviting_profile=None):
         token = str(uuid.uuid4())
@@ -53,10 +57,10 @@ class Profile(models.Model):
         self.api_key = base64.urlsafe_b64encode(os.urandom(24))
         self.save()
 
-    def send_report(self):
+    def send_report(self, num_of_days):
         # reset next report date first:
         now = timezone.now()
-        self.next_report_date = now + timedelta(days=30)
+        self.next_report_date = now + timedelta(days=num_of_days)
         self.save()
 
         token = signing.Signer().sign(uuid.uuid4())
