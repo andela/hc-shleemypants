@@ -35,23 +35,23 @@
 
                 </br>
 
-                    <label for="reports_frequency">Reports Timing:
+                    <label for="report_freqs">Reports Timing:
                     </label>
-                    <select id="reports_frequency" name="reports_frequency">
+                    <select id="report_freqs" name="report_freqs">
                         <!-- immediately send reports-->
-                        <option value="now" {% if profile.reports_freqs == "now" %} selected {% endif %}>
+                        <option value="now" {% if profile.report_freqs == "now" %} selected {% endif %}>
                             immediately
                         </option>
                         <!-- RReporting sending should be daily -->
-                        <option value="daily" {% if profile.reports_freqs == "daily" %} selected {% endif %}>
+                        <option value="daily" {% if profile.report_freqs == "daily" %} selected {% endif %}>
                             daily
                         </option>
                         <!-- send weekly reports -->
-                        <option value="weekly" {% if profile.reports_freqs == "weekly" %} selected {% endif %}>
+                        <option value="weekly" {% if profile.report_freqs == "weekly" %} selected {% endif %}>
                             weekly
                         </option>
                         <!-- send monthly reports -->
-                        <option value="monthly" {% if profile.reports_freqs == "monthly" %} selected {% endif %}>
+                        <option value="monthly" {% if profile.report_freqs == "monthly" %} selected {% endif %}>
                             monthly
                         </option>
                     </select>

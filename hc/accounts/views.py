@@ -157,7 +157,8 @@ def profile(request):
             form = ReportSettingsForm(request.POST)
             if form.is_valid():
                 profile.reports_allowed = form.cleaned_data["reports_allowed"]
-                report_freq = form.cleaned_data["report_freq"]
+                report_freq = form.cleaned_data["report_freqs"]
+                
                 # check user specified time period
                 num_of_days = 0
                 if report_freq == "weekly":
