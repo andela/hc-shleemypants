@@ -25,9 +25,9 @@ class ProfileTestCase(BaseTestCase):
         check = Check(name="Test Check", user=self.alice)
         check.save()
 
-        self.alice.profile.send_report()
-
-        ###Assert that the email was sent and check email content
+        self.alice.profile.send_report(7)
+        self.assertGreater(len(mail.outbox), 0)
+        self.assertIn(mail.outbox[0].subject, "Recent Reports")
 
     def test_it_adds_team_member(self):
         self.client.login(username="alice@example.org", password="password")
