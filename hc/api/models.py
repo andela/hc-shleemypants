@@ -82,7 +82,7 @@ class Check(models.Model):
 
         return errors
 
-    def alert_run_too_often():
+    def alert_run_too_often(self):
         """Notify user when job is run too often."""
         self.status = "often"
         self.send_alert()
