@@ -13,6 +13,8 @@ MINUTE = Unit("minute", 60)
 HOUR = Unit("hour", MINUTE.nsecs * 60)
 DAY = Unit("day", HOUR.nsecs * 24)
 WEEK = Unit("week", DAY.nsecs * 7)
+MONTH = Unit("month", WEEK.nsecs * 4)
+YEAR = Unit("year", MONTH.nsecs * 12)
 
 
 @register.filter
