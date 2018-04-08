@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}FAQs - healthchecks.io{% endblock %}
+
+{% block content %}
+{%if question_list%}
+  here are the questiions
+{%else %}
+no questions
+{% endif%}
+
+{% endblock %}
+
