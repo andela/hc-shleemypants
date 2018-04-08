@@ -9,18 +9,13 @@
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 {% for question in question_list %}
   <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingOne">
+      <div class="panel-heading" role="tab" id="heading{{question.id}}">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion"
             href="#collapse{{question.id}}" 
-            {%if loop.first %}
             aria-expanded="true"
-            {%else%}
-            aria-expanded="false"
-            {%endif%}
             aria-controls="collapse{{question.id}}">
-            {{question.question_text}} 
-            {{loop.index}} 
+            {{question.question_text}}
         </a>
       </h4>
     </div>
