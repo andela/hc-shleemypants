@@ -159,18 +159,21 @@ def profile(request):
                 profile.reports_allowed = form.cleaned_data["reports_allowed"]
                 report_freq = form.cleaned_data["report_freqs"]
                 
-                # check user specified time period
-                num_of_days = 0
-                if report_freq == "weekly":
-                    num_of_days = 7
-                if report_freq == "monthly":
-                    num_of_days = 30
-                if report_freq == "daily":
-                    num_of_days = 1
-                if report_freq == "now":
-                    num_of_days = 1
+                if profile.reports_allowed:
+                    # check user specified time period
+                    num_of_days = 0
+                    if report_freq == "weekly":
+                        num_of_days = 7
+                    if report_freq == "monthly":
+                        num_of_days = 30
+                    if report_freq == "daily":
+                        num_of_days = 1
+                    if report_freq == "immediately":
+                        num_of_days = 1
+                    
+                    profile.send_report(num_of_days)
                 
-                profile.send_report(num_of_days)
+                
                 profile.save()
                 messages.success(request, "Your settings have been updated!")
                 
