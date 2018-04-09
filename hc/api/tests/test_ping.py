@@ -1,5 +1,7 @@
-from django.test import Client, TestCase
+from django.utils import timezone
+from datetime import timedelta
 
+from django.test import Client, TestCase
 from hc.api.models import Check, Ping
 
 
@@ -68,6 +70,14 @@ class PingTestCase(TestCase):
         r = self.client.get("/ping/%s/" % self.check.code)
         assert "no-cache" in r.get("Cache-Control")
 
-    ### Test that when a ping is made a check with a paused status changes status
-    ### Test that a post to a ping works
-    ### Test that the csrf_client head works
+    def test_it_handles_often(self):
+        self.check.status = "up"
+        self.check.last_ping = timezone.now() - timedelta(minutes=1200)
+        self.check.save()
+        r = self.client.get("/ping/%s/" % self.check.code)
+        self.check.refresh_from_db()
+        self.assertTrue(self.check.often)
+
+        ### Test that when a ping is made a check with a paused status changes status
+        ### Test that a post to a ping works
+        ### Test that the csrf_client head works
