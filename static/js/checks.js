@@ -56,7 +56,6 @@ $(function () {
     });
 
     periodSlider.noUiSlider.on("update", function(a, b, value) {
-        debugger;
         var rounded = Math.round(value);
         $("#period-slider-value").text(secsToText(rounded));
         $("#update-timeout-timeout").val(rounded);
