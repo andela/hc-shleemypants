@@ -35,7 +35,6 @@ class CheckModelTestCase(TestCase):
         check.status = "paused"
         self.assertFalse(check.in_grace_period())
 
-    ### Test that when a new check is created, it is not in the grace period
     def test_new_check_is_not_in_grace_period(self):
         check = Check()
 
