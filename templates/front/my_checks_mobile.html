@@ -1,5 +1,5 @@
 {% load hc_extras humanize %}
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.min.css">
 <ul id="checks-list" class="visible-xs">
     {% for check in checks %}
     <li>
@@ -33,7 +33,10 @@
                         <span class="label label-success">UP</span>
                     {% elif check.get_status == "down" %}
                         <span class="label label-danger">DOWN</span>
+                    {% elif check.get_status == "often" %}
+                        <span class="fa fa-history"></span>
                     {% endif %}
+                    
                 </td>
             </tr>
             {% if check.tags %}
