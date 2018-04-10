@@ -16,6 +16,14 @@ class FaqsTestCase(TestCase):
         total_answers = q.answer_set.count()
         self.assertEqual(total_answers, 1)
  
+    def test_question_can_have_multiple_answers(self):
+        q = Question(question_text ="what does healthchecks do?")
+        q.save()
+        q.answer_set.create(answer_text = "it monitors your cron jobs" )
+        q.answer_set.create(answer_text = "It sends you alerts" )
+        total_answers = q.answer_set.count()
+        self.assertEqual(total_answers, 2)
+ 
     def test_answer_is_related_to_question(self):
         q = Question(question_text ="what does healthchecks do?")
         q.save()
