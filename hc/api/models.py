@@ -69,7 +69,7 @@ class Check(models.Model):
         return "%s@%s" % (self.code, settings.PING_EMAIL_DOMAIN)
 
     def send_alert(self):
-        if self.status not in ("up", "down"):
+        if self.status not in ("up", "down", "late"):
             raise NotImplementedError("Unexpected status: %s" % self.status)
 
         errors = []
@@ -86,8 +86,10 @@ class Check(models.Model):
 
         now = timezone.now()
 
-        if self.last_ping + self.timeout + self.grace > now:
+        if self.last_ping + self.timeout > now:
             return "up"
+        elif self.last_ping + self.timeout + self.grace > now:
+            return "late"
 
         return "down"
 
