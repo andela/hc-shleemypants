@@ -12,7 +12,6 @@ class CheckModelTestCase(TestCase):
 
         check.tags = " foo  bar "
         self.assertEquals(check.tags_list(), ["foo", "bar"])
-        ### Repeat above test for when check is an empty string
     
     def test_it_strips_empty_tags(self):
         check = Check()
@@ -48,4 +47,10 @@ class CheckModelTestCase(TestCase):
         check.last_ping = timezone.now() 
 
         self.assertFalse(check.in_grace_period())
-    
+
+    def test_send_alert(self):
+        check = Check()
+
+        if check.status not in ("up", "down", "often"):
+            self.assertRaises(NotImplementedError, msg="Unexpected status")       
+            
