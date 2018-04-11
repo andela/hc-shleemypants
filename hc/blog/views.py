@@ -1,4 +1,4 @@
-from django.shortcuts import, render, getObject_or_404
+from django.shortcuts import render, get_object_or_404
 from .models import Post
 
 def post_list_view(request):

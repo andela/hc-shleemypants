@@ -37,5 +37,6 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+    #create an absolute path using the details in the model object
     def get_absolute_url(self):
         return reverse('blog:post_detail_view', args=[self.publish.year, self.publish.strftime('%m'),self.publish.strftime('%d'),self.slug])
