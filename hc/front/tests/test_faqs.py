@@ -34,4 +34,9 @@ class FaqsTestCase(TestCase):
 
     def test_user_can_view_faqs(self):
         #create a question and answer to be used by the view
-        pass
+        q = Question(question_text ="what does healthchecks do?")
+        q.save()
+        ans = q.answer_set.create(answer_text = "it monitors your cron jobs" )
+        q.answer_set.create(answer_text = "it monitors your cron jobs" )
+        response = self.client.get("/faqs/")
+        self.assertContains(response, "what does healthchecks do?")
