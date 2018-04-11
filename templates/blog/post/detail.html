@@ -6,4 +6,5 @@
     <h3>{{ post.title }}</h3>
     <p class="small">Published {{ post.publish }} by {{ post.author }}</p>
     <p>{{ post.body|linebreaks }}</p>
+    <div class="fb-comments" data-href="{{ post.build_absolute_uri }}" data-numposts="5"></div>
 {% endblock %}
