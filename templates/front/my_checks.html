@@ -34,9 +34,26 @@
     <div class="col-sm-12">
 
 
-    {% if checks %}
-        {% include "front/my_checks_mobile.html" %}
+    {% if up or unresolved %}
+        <ul class="nav nav-tabs hidden-xs" role="tablist">
+                <li class="active">
+                    <a href="#ok_desktop" data-toggle="tab">Working </a>
+                </li>
+                <li>
+                    <a href="#unresolved_desktop" data-toggle="tab">Unresolved</a>
+                </li>
+            </ul>
+        <ul class="nav nav-tabs visible-xs" role="tablist">
+                <li class="active">
+                    <a href="#ok_mobile" data-toggle="tab">Working </a>
+                </li>
+                <li>
+                    <a href="#unresolved_mobile" data-toggle="tab">Unresolved</a>
+                </li>
+            </ul>
         {% include "front/my_checks_desktop.html" %}
+        {% include "front/my_checks_mobile.html" %}
+
     {% else %}
     <div class="alert alert-info">You don't have any checks yet.</div>
     {% endif %}
@@ -131,6 +148,7 @@
                             1 day
                         </span>
                     </div>
+                    
                     <div id="period-slider"></div>
 
                     <div class="update-timeout-info text-center">

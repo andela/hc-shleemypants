@@ -17,6 +17,7 @@ from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm,
                             TimeoutForm)
+from .models import Question
 
 
 # from itertools recipes:
@@ -47,9 +48,13 @@ def my_checks(request):
             elif check.in_grace_period():
                 grace_tags.add(tag)
 
+    unresolved = [new_check for new_check in checks if new_check.get_status() == "down"]
+    up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new"]
+
     ctx = {
         "page": "checks",
-        "checks": checks,
+        "up": up,
+        "unresolved":unresolved,
         "now": timezone.now(),
         "tags": counter.most_common(),
         "down_tags": down_tags,
@@ -103,6 +108,20 @@ def docs(request):
 
     return render(request, "front/docs.html", ctx)
 
+def faqs(request):
+    check = _welcome_check(request)
+    question_list = Question.objects.all()
+
+    ctx = {
+        "page": "faqs",
+        "section": "home",
+        "ping_endpoint": settings.PING_ENDPOINT,
+        "check": check,
+        "ping_url": check.url(),
+        "question_list": question_list
+    }
+
+    return render(request, "front/faqs.html", ctx)
 
 def docs_api(request):
     ctx = {
