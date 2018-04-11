@@ -2,7 +2,13 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+#a custom manager to retrieve only the published posts
+class PublishedManager(models.Manager):
+    def get_quesryset(self):
+        return super(PublishedManager,self).get_quesryset().filter(status='published')
+    
 class Post(models.Model):
+
     # A post model to store our posts
     POST_STATUS = (
         ('draft', 'Draft'),
@@ -16,6 +22,12 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=POST_STATUS, default='draft')
+
+    #our custom manager
+    published = PublishedManager()
+
+    #default manager
+    objects = models.Manager()
  
     class Meta:
         # tell django to sort our data in descending prder when we quesry
