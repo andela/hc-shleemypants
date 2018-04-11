@@ -8,6 +8,7 @@ class FaqsTestCase(TestCase):
         q.save()
         total_quiz = Question.objects.count()
         self.assertEqual(total_quiz, 1)
+        self.assertEqual(str(q), "what does healthchecks do?")
 
     def test_can_answer_question(self):
         q = Question(question_text ="what does healthchecks do?")
@@ -15,6 +16,7 @@ class FaqsTestCase(TestCase):
         q.answer_set.create(answer_text = "it monitors your cron jobs" )
         total_answers = q.answer_set.count()
         self.assertEqual(total_answers, 1)
+        self.assertEqual(str(q.answer_set.all()[0]),"it monitors your cron jobs" )
  
     def test_question_can_have_multiple_answers(self):
         q = Question(question_text ="what does healthchecks do?")
@@ -29,5 +31,7 @@ class FaqsTestCase(TestCase):
         q.save()
         ans = q.answer_set.create(answer_text = "it monitors your cron jobs" )
         self.assertEqual(ans.question.question_text, "what does healthchecks do?")
-        
 
+    def test_user_can_view_faqs(self):
+        #create a question and answer to be used by the view
+        pass
