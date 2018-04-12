@@ -22,12 +22,19 @@ class ProfileTestCase(BaseTestCase):
         ### Assert that the email was sent and check email content
 
     def test_it_sends_report(self):
+        #login user
+        self.client.login(username="alice@example.org", password="password")
+
         check = Check(name="Test Check", user=self.alice)
         check.save()
 
-        self.alice.profile.send_report()
+        form = {"update_reports_allowed":"1" ,"report_freqs": "immediately"}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEquals(200,  r.status_code)
 
-        ###Assert that the email was sent and check email content
+        self.alice.profile.send_report(7)
+        self.assertGreater(len(mail.outbox), 0)
+        self.assertIn(mail.outbox[0].subject, "Recent Reports")
 
     def test_it_adds_team_member(self):
         self.client.login(username="alice@example.org", password="password")

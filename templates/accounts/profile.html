@@ -29,9 +29,32 @@
                         <input
                             name="reports_allowed"
                             type="checkbox"
-                            {% if profile.reports_allowed %} checked {% endif %}>
-                        Each month send me a summary of my checks
+                            {% if profile.reports_allowed %} checked {% endif %}/>
+                         Send me a summary of my checks reports
                     </label>
+
+                </br>
+
+                    <label for="report_freqs">Reports Timing:
+                    </label>
+                    <select id="report_freqs" name="report_freqs">
+                        <!-- immediately send reports-->
+                        <option value="immediately" {% if profile.report_freqs == "immediately" %} selected {% endif %}>
+                            immediately
+                        </option>
+                        <!-- RReporting sending should be daily -->
+                        <option value="daily" {% if profile.report_freqs == "daily" %} selected {% endif %}>
+                            daily
+                        </option>
+                        <!-- send weekly reports -->
+                        <option value="weekly" {% if profile.report_freqs == "weekly" %} selected {% endif %}>
+                            weekly
+                        </option>
+                        <!-- send monthly reports -->
+                        <option value="monthly" {% if profile.report_freqs == "monthly" %} selected {% endif %}>
+                            monthly
+                        </option>
+                    </select>
                     <button
                         name="update_reports_allowed"
                         type="submit"
