@@ -1,7 +1,6 @@
 {% load hc_extras humanize %}
-
-
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<table id="checks-table" class="table hidden-xs">
 <div class="tab-content">
     <div class="tab-pane active" id="ok_desktop">
     {% if up %}
@@ -33,6 +32,8 @@
                 <span class="status icon-up"></span>
             {% elif check.get_status == "down" %}
                 <span class="status icon-down"></span>
+            {% elif check.get_status == "often" %}
+                <span class="fa fa-history"></span>
             {% endif %}
         </td>
         <td class="name-cell">
