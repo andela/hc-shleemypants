@@ -16,6 +16,12 @@
     background: #eee;
 }
 
+.about-text {
+    text-align: center;
+    padding: 2%;
+    font-size: 1.3em;
+    margin-top: -5%;
+}
 
 #pitch {
     text-align: center;

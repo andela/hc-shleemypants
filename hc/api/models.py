@@ -89,6 +89,10 @@ class Check(models.Model):
         if self.last_ping + self.timeout + self.grace > now:
             return "up"
 
+
+        if self.often and ((now - self.last_ping) < (self.timeout + self.grace)):
+            return "often"
+
         return "down"
 
     def in_grace_period(self):
