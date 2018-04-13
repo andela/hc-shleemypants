@@ -6,7 +6,8 @@ import requests
 from six.moves.urllib.parse import quote
 
 from hc.lib import emails
-
+import telepot
+from twilio.rest import Client
 
 def tmpl(template_name, **ctx):
     template_path = "integrations/%s" % template_name
@@ -216,3 +217,36 @@ class VictorOps(HttpTransport):
         }
 
         return self.post(self.channel.value, payload)
+
+
+def make_message(check):
+    """Transforms a check into a message"""
+    message = "The cron job " + check.name + " code " + str(check.code)
+    if check.status == 'down':
+        message = "{} is DOWN \nlast check in was on {}".format(message, 
+                    str(check.last_ping.strftime("%Y-%m-%d %H:%M:%S")))
+        return message
+    message = "{} is UP now, we have recieved a ping".format(message)
+    return message
+
+
+class Telegram(HttpTransport):
+    """Transport to send telegram notifications"""
+    def notify(self, check):
+        tele_bot = telepot.Bot(settings.TELEGRAM_TOKEN)
+        tele_bot.sendMessage(
+            self.channel.value,
+            make_message(check)
+        )
+
+
+class Sms(HttpTransport):
+    """Transport to send sms notifications"""
+    def notify(self, check):
+        twilio_client = Client(settings.TWILLIO_ACCOUNT_SID, settings.TWILLIO_AUTH_TOKEN)
+        twilio_client.messages.create(
+            self.channel.value,
+            body=make_message(check),
+            from_=settings.TWILLIO_NUMBER
+        )
+        
