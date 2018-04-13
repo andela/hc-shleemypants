@@ -19,7 +19,7 @@ class UpdateTimeoutTestCase(BaseTestCase):
 
         check = Check.objects.get(code=self.check.code)
 
-        assert check.timeout.total_seconds() == 86400
+        assert check.timeout.total_seconds() == 3600
         assert check.grace.total_seconds() == 3600
 
     def test_team_access_works(self):
@@ -33,7 +33,7 @@ class UpdateTimeoutTestCase(BaseTestCase):
 
         check = Check.objects.get(code=self.check.code)
 
-        assert check.timeout.total_seconds() == 86400
+        assert check.timeout.total_seconds() == 7200
 
     def test_it_handles_bad_uuid(self):
         url = "/checks/not-uuid/timeout/"
