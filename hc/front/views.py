@@ -174,10 +174,9 @@ def check_priority(request, code):
     assert request.method == "POST"
  
     check = get_object_or_404(Check, code=code)
-
     form = PriorityForm(request.POST)
     if form.is_valid():
-        check.priority = form.cleaned_data["select_priority"]
+        check.priority = form.cleaned_data["selected_priority"]
         check.save()
     return redirect("hc-checks")
 
