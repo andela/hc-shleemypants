@@ -221,12 +221,7 @@ class VictorOps(HttpTransport):
 
 def make_message(check):
     """Transforms a check into a message"""
-    message = "The cron job " + check.name + " code " + str(check.code)
-    if check.status == 'down':
-        message = "{} is DOWN \nlast check in was on {}".format(message, 
-                    str(check.last_ping.strftime("%Y-%m-%d %H:%M:%S")))
-        return message
-    message = "{} is UP now, we have recieved a ping".format(message)
+    message = "The cron job {} code {} is {} last ping was at {}".format(check.name, check.code, (check.status).upper(), str(check.last_ping.strftime("%Y-%m-%d %H:%M:%S")))
     return message
 
 

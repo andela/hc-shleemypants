@@ -291,7 +291,6 @@ def channels(request):
 
 def do_add_channel(request, data):
     my_data = {}
-    print(">>>>", data)
     if data.get('kind') == 'telegram':
         telepot_bot = telepot.Bot(settings.TELEGRAM_TOKEN)
         updates = telepot_bot.getUpdates(allowed_updates=['message'])
