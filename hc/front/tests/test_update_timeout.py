@@ -18,8 +18,9 @@ class UpdateTimeoutTestCase(BaseTestCase):
         self.assertRedirects(r, "/checks/")
 
         check = Check.objects.get(code=self.check.code)
-        assert check.timeout.total_seconds() == 3600
-        assert check.grace.total_seconds() == 60
+
+        assert check.timeout.total_seconds() == 86400
+        assert check.grace.total_seconds() == 3600
 
     def test_team_access_works(self):
         url = "/checks/%s/timeout/" % self.check.code
@@ -31,7 +32,8 @@ class UpdateTimeoutTestCase(BaseTestCase):
         self.client.post(url, data=payload)
 
         check = Check.objects.get(code=self.check.code)
-        assert check.timeout.total_seconds() == 7200
+
+        assert check.timeout.total_seconds() == 86400
 
     def test_it_handles_bad_uuid(self):
         url = "/checks/not-uuid/timeout/"

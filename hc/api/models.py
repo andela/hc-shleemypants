@@ -23,7 +23,7 @@ STATUSES = (
 )
 DEFAULT_TIMEOUT = td(days=1)
 DEFAULT_GRACE = td(hours=1)
-DEFAULT_NAG=td(minutes=1)
+DEFAULT_NAG= td(minutes=1)
 CHANNEL_KINDS = (("email", "Email"), ("webhook", "Webhook"),
                  ("hipchat", "HipChat"),
                  ("slack", "Slack"), ("pd", "PagerDuty"), ("po", "Pushover"),
@@ -117,6 +117,15 @@ class Check(models.Model):
         grace_ends = up_ends + self.grace
         return up_ends < timezone.now() < grace_ends
 
+    def in_nag_period(self):
+        if self.status in ("new", "paused"):
+            return False
+
+        up_ends = self.last_ping + self.timeout
+        grace_ends = up_ends + self.grace
+        return up_ends  < grace_ends < timezone.now()
+
+
     def assign_all_channels(self):
         if self.user:
             channels = Channel.objects.filter(user=self.user)
@@ -135,7 +144,7 @@ class Check(models.Model):
             "tags": self.tags,
             "timeout": int(self.timeout.total_seconds()),
             "grace": int(self.grace.total_seconds()),
-            "nag": int(self.nag.total_seconds),
+            "nag": int(self.nag.total_seconds()),
             "n_pings": self.n_pings,
             "status": self.get_status()
         }
