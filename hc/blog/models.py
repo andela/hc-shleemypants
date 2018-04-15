@@ -3,6 +3,19 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+#Post Category model
+class PostsCategory(models.Model):
+    title = models.CharField(max_length=300)
+    slug = models.SlugField(unique = True)
+
+    def save (self,*args,**kwargs):
+        self.slug = slugify(self.title)
+        super(BlogPostsCategory, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+
 #a custom manager to retrieve only the published posts
 class PublishedManager(models.Manager):
     def get_quesryset(self):
@@ -18,11 +31,17 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique_for_date='publish') #for seo friendly urls
     author = models.ForeignKey(User, related_name='blog_posts')
+    category = models.ForeignKey(PostsCategory, on_delete=models.CASCADE)
     body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=POST_STATUS, default='draft')
+
+    
+    def save (self,*args,**kwargs):
+        self.slug = slugify(self.title)
+        super(BlogPosts, self).save(*args, **kwargs)
 
     #our custom manager
     published = PublishedManager()
