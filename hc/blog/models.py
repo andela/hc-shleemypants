@@ -38,7 +38,7 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=POST_STATUS, default='draft')
 
-    
+
     def save (self,*args,**kwargs):
         self.slug = slugify(self.title)
         super(BlogPosts, self).save(*args, **kwargs)
@@ -59,3 +59,18 @@ class Post(models.Model):
     #create an absolute path using the details in the model object
     def get_absolute_url(self):
         return reverse('blog:post_detail_view', args=[self.publish.year, self.publish.strftime('%m'),self.publish.strftime('%d'),self.slug])
+
+# Model for blog posts comments
+class Comment(models.Model):
+    post = models.ForeignKey(BlogPosts, related_name='comments')
+    name = models.ForeignKey(settings.AUTH_USER_MODEL, default = 1)
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return 'Comment by {} on {}'.format(self.name, self.post)
