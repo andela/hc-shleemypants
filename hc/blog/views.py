@@ -29,8 +29,8 @@ def create_categories_and_blogs(request):
     """ New blogposts and categories are created in this function"""
     form_category = BlogPostsCategoryForm(request.POST or None, prefix="create_category")
     form_blog = BlogPostsForm(request.POST or None, prefix="create_blog")
-    categories = BlogPostsCategory.objects.all()
-    blogs = BlogPosts.objects.all()
+    categories = PostsCategory.objects.all()
+    blogs = Post.objects.all()
     cxt = {
         'form':form_category,
         'categories':categories,
@@ -54,8 +54,8 @@ def create_categories_and_blogs(request):
             content = request.POST['content']
             author = request.user
             if title and category_input and content:
-                category_query = get_object_or_404(BlogPostsCategory, title=category_input)
-                blog=BlogPosts(author=author, title=title, content=content, category=category_query)
+                category_query = get_object_or_404(PostsCategory, title=category_input)
+                blog=Post(author=author, title=title, content=content, category=category_query)
                 blog.save()  
                 return HttpResponseRedirect('/blogs/', cxt)
         return render(request, 'blog/create_categories_and_blogs.html', cxt)
@@ -68,8 +68,8 @@ def create_blogs(request):
     """A function to render the template for creating blog posts"""
     form_category = BlogPostsCategoryForm(request.POST or None, prefix="create_category")
     form_blog = BlogPostsForm(request.POST or None, prefix="create_blog")
-    categories = BlogPostsCategory.objects.all()
-    blogs = BlogPosts.objects.all()
+    categories = PostsCategory.objects.all()
+    blogs = Post.objects.all()
     cxt = {
         'form':form_category,
         'categories':categories,
@@ -116,7 +116,7 @@ def add_comment(request, post):
         'form_comment':form_comment,
         'comments':comments
     }
-    blog = BlogPosts.objects.get(id=post)
+    blog = Post.objects.get(id=post)
     if request.method == "POST":
         if "add_comment" in request.POST: 
             if form_comment.is_valid():
