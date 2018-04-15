@@ -15,6 +15,19 @@
         {% endif %}
         </h1>
     </div>
+    <div class=" col-sm-12 cs-dptmnt">
+      <p>Departments</p>
+    </div>
+    <div class="col-sm-12" id="my-checks-tags" style="padding-bottom: 10px;">
+      <button aria-pressed="false" class="btn btn-default btn-xs cs-dep" data-toggle="button">Finance</button>
+      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Learning</button>
+      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Success</button>
+      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Technology</button>
+      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Strategy</button>
+      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Revenue</button>
+      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Talent</button>
+    </div>
+
     {% if tags %}
     <div id="my-checks-tags" class="col-sm-12">
         {% for tag, count in tags %}
