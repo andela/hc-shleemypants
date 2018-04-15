@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -41,7 +42,7 @@ class Post(models.Model):
 
     def save (self,*args,**kwargs):
         self.slug = slugify(self.title)
-        super(BlogPosts, self).save(*args, **kwargs)
+        super(Post, self).save(*args, **kwargs)
 
     #our custom manager
     published = PublishedManager()
@@ -62,7 +63,7 @@ class Post(models.Model):
 
 # Model for blog posts comments
 class Comment(models.Model):
-    post = models.ForeignKey(BlogPosts, related_name='comments')
+    post = models.ForeignKey(Post, related_name='comments')
     name = models.ForeignKey(settings.AUTH_USER_MODEL, default = 1)
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
