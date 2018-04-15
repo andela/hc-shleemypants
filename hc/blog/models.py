@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.template.defaultfilters import slugify
 
 #Post Category model
 class PostsCategory(models.Model):
@@ -11,7 +12,7 @@ class PostsCategory(models.Model):
 
     def save (self,*args,**kwargs):
         self.slug = slugify(self.title)
-        super(BlogPostsCategory, self).save(*args, **kwargs)
+        super(PostsCategory, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title

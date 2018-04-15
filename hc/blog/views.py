@@ -16,15 +16,6 @@ from hc.front.views import _welcome_check
 from .forms import BlogPostsCategoryForm, BlogPostsForm, CommentForm
 from .models import Post, PostsCategory, Comment
 
-def post_list_view(request):
-    posts = Post.published.all()
-    return render(request, 'blog/post/list.html', {'posts': posts})
-
-def post_detail_view(request, year, month, day, post):
-    post = get_object_or_404(Post, slug=post, status='published', publish__year=year, publish__month=month, publish__day=day)
-    return render(request, 'blog/post/detail.html', {'post': post})
-
-
 def create_categories_and_blogs(request):
     """ New blogposts and categories are created in this function"""
     form_category = BlogPostsCategoryForm(request.POST or None, prefix="create_category")
@@ -39,14 +30,14 @@ def create_categories_and_blogs(request):
     }
     if request.method == 'POST':
         if "create_category" in request.POST:
-            if form.is_valid():
+            if form_category.is_valid():
                 category = form_category.save(commit=False)
-                category.title = form.cleaned_data['title']
+                category.title = form_category.cleaned_data['title']
                 try:
                     category.save()
                 except IntegrityError:
-                    messages.warning(request, 'The category already exists.Create a blog post under that category!')
-            return HttpResponseRedirect('/blogs/', cxt)
+                    messages.warning(request, 'The category already exists. Kindly create a different category or use it!')
+            return HttpResponseRedirect('/blog/', cxt)
         elif "create_blog" in request.POST:
             form_blog = BlogPostsForm(request.POST, prefix='create_blog')
             title = request.POST['title']
@@ -55,11 +46,11 @@ def create_categories_and_blogs(request):
             author = request.user
             if title and category_input and content:
                 category_query = get_object_or_404(PostsCategory, title=category_input)
-                blog=Post(author=author, title=title, content=content, category=category_query)
+                blog=Post(author=author, title=title, body=content, category=category_query)
                 blog.save()  
-                return HttpResponseRedirect('/blogs/', cxt)
+                return HttpResponseRedirect('/blog/', cxt)
         return render(request, 'blog/create_categories_and_blogs.html', cxt)
-        # return HttpResponseRedirect('/blogs/', cxt)
+       
     else:
         return render(request, "blog/view_blogs.html", cxt)
 
@@ -126,7 +117,7 @@ def add_comment(request, post):
                 comment.post = blog
                 form_comment.save()
                 messages.success(request, "Comment successfully added")
-                return redirect('blogs:hc-view-blog', post)
+                return redirect('blog:hc-view-blog', post)
             return render(request, "blog/view_posts.html", cxt)
     return render(request, "blog/view_posts.html", cxt)
     
@@ -178,8 +169,8 @@ def edit_blog(request, pk):
                 blog.content = form.cleaned_data['content']
                 blog.save()
                 messages.success(request, "Blog successfully edited")
-                return redirect('blogs:hc-view-blog', blog.id)
-            return redirect('blogs:hc-edit-blog', post.id)
+                return redirect('blog:hc-view-blog', blog.id)
+            return redirect('blog:hc-edit-blog', post.id)
         else:
             form = BlogPostsForm(instance=post)
             cxt = {
@@ -194,4 +185,4 @@ def delete_blog(request, pk):
     """This function allows for deleting a single blog post"""
     post = get_object_or_404(Post, pk=pk)
     post.delete()
-    return redirect('blogs:hc-category')
+    return redirect('blog:hc-category')

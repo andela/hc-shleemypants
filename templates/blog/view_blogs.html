@@ -12,17 +12,17 @@
     <div class='col-md-3'>
         {% if request.user.is_authenticated %}
         <div class="row">
-            <a id="addcategory" style="margin-top:-20px" href="{% url 'blogs:hc-categories' %}">
+            <a id="addcategory" style="margin-top:-20px" href="{% url 'blog:hc-categories' %}">
                 <button type="button" class="btn btn-primary ">Add Blog Post</button>
             </a>
         </div>
         {% endif %}
         <div class="row aside">
-            <h3> Blog Categories</h3>
+            <h3> Previously used Categories</h3>
             <ul class="list-group lists ">
                 {% for category in categories %}
                 <li class="list-group-item ">
-                    <a style="font-size:20px;" href="{% url 'blogs:hc-category-blogs' category=category.id %}"> {{ category.title|title }}</a>
+                    <a style="font-size:20px;" href="{% url 'blog:hc-category-blogs' category=category.id %}"> {{ category.title|title }}</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -48,7 +48,7 @@
                         {{ blog.body| truncatechars:90 }}
                     </div>
                     <div id="footer" class="panel-footer" style="font-size:20px">
-                        <a style="font-size:20px;" href="{% url 'blogs:hc-view-blog' blog.id %}">
+                        <a style="font-size:20px;" href="{% url 'blog:hc-view-blog' blog.id %}">
                             Read More
                         </a>
                     </div>
@@ -57,7 +57,7 @@
                 {% endfor %} {% else%}
                 <div id="panelpost1" class="col-md-4 panel panel-default">
                     <div class="panel-body panel-body2">
-                        No Blog Stories In Here.
+                        No blog posts yet. Keep checking or add a new one... :)
                     </div>
                     {% endif %}
                 </div>

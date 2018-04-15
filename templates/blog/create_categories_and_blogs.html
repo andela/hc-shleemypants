@@ -10,7 +10,7 @@
             <h2 class="panel-title">Add Blog</h2>
         </div>
         <div class="panel-body">
-            <form method="post" action="{% url 'blogs:hc-category' %}">
+            <form method="post" action="{% url 'blog:hc-category' %}">
                 {% csrf_token %}
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1">category</span>
