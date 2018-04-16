@@ -11,7 +11,7 @@ addons:
 notifications:
     slack: andela:foPd7ZwUachWl2OLu911aZC3#hc-shleemypantsbuilds
 script:
-  - python manage.py makemigrations
+  - python manage.py makemigrations --merge --no-input
   - coverage run --omit=*/tests/* --source=hc manage.py test
 
 after_success: coveralls
