@@ -12,6 +12,7 @@
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
 
     {% compress css %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/icomoon.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/nouislider.min.css' %}" type="text/css">
@@ -92,6 +93,9 @@
 
                 <li {% if page == 'docs' %} class="active" {% endif %}>
                     <a href="{% url 'hc-docs' %}">Docs</a>
+                </li>
+                <li {% if page == 'faqs' %} class="active" {% endif %}>
+                    <a href="{% url 'hc-faqs' %}">FAQs</a>
                 </li>
 
                 <li {% if page == 'about' %} class="active" {% endif %}>
