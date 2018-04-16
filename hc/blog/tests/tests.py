@@ -20,13 +20,13 @@ class BlogPostsCategories(BaseTestCase):
 
     
     def test_create_blog(self):
-        url = reverse('blogs:hc-category')
+        url = reverse('blog:hc-category')
         blog = BlogPosts.objects.filter(title='Django newbies').first()
         self.assertEqual('Django newbies', blog.title)
 
 
     def test_create_category(self):
-        url = reverse('blogs:hc-category')
+        url = reverse('blog:hc-category')
         data = {'create_category-title': ['read'], 'create_category': ['']}
         response = self.client.post(url, data)
         category = PostsCategory.objects.filter(title='read').first()
@@ -34,7 +34,7 @@ class BlogPostsCategories(BaseTestCase):
 
 
     def test_home_page_returns_all_categories(self):
-        url = reverse('blogs:hc-category')
+        url = reverse('blog:hc-category')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/view_blogs.html')

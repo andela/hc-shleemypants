@@ -19,26 +19,16 @@
                 {% if request.user == blog.author %}
                 <a id="button1" href="{% url 'blog:hc-edit-blog' blog.id %}">
                     <button type="button" class="btn btn-primary">
-                        edit blog
+                        Edit post
                     </button>
                 </a>
                 <a id="button1" href="{% url 'blog:hc-delete-blog' blog.id %}">
                     <button type="button" class="btn btn-primary">
-                        delete blog
+                        Delete post
                     </button>
                 </a>
                 {% endif %}
-                <a id="button2" class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{blog.title}}&url={{tweet_url}}&hashtags=HealthChecks">
-                    <button type="button" class="btn btn-primary">
-                        Twitter
-                    </button>
-                </a>
-                <a id="button2" target="_blank" href="http://www.linkedin.com/shareArticle?url=hc-the-knight.herokuapp.com{{ request.get_full_path|urlencode }}&title={{ blog.title }}&summary={{ blog.content }}&source=hc-bigas-opus.herokuapp.com"
-                    class="fa fa-linkedin">
-                    <button type="button" class="btn btn-primary">
-                        LinkedIn
-                    </button>
-                </a>
+                
             </div>
         </div>
 
@@ -60,6 +50,7 @@
             <div class="panel-body">
                 {{ comment.body }}
             </div>
+            <p> By {{ request.user.email }}</p>
         </div>
         {% endfor %}
         <!-- add pagination -->

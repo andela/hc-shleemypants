@@ -124,7 +124,6 @@ def add_comment(request, post):
 def view_blog_detail(request, pk):
     """This function displays a single blog and the comments associated with it"""
     form_comment = CommentForm(request.POST or None)
-    tweet_url = 'hc-shleeymypants.herokuapp.com/blog/view/{}'.format(pk)
     blog = Post.objects.filter(pk=pk).first()
     comments_list = Comment.objects.filter(post=blog)
     paginator = Paginator(comments_list, 5)
@@ -143,7 +142,6 @@ def view_blog_detail(request, pk):
         'blog':blog,
         'post':blog.id,
         'pk': blog.id,
-        'tweet_url': tweet_url, 
     }
     return render(request, "blog/view_posts.html", ctx)
 
@@ -166,7 +164,7 @@ def edit_blog(request, pk):
             if form.is_valid():
                 blog.category = form.cleaned_data['category']
                 blog.title = form.cleaned_data['title']
-                blog.content = form.cleaned_data['content']
+                blog.body = form.cleaned_data['body']
                 blog.save()
                 messages.success(request, "Blog successfully edited")
                 return redirect('blog:hc-view-blog', blog.id)
