@@ -60,6 +60,10 @@ class MyChecksTestCase(BaseTestCase):
         # Mobile
         self.assertContains(r, "label-warning")
 
+        def test_default_priority_is_normal(self):
+            self.client.login(username="alice@example.org", password="password")
+            self.assertEqual(self.check.priority, 0)
+
         def test_it_sets_priority(self):
             self.client.login(username="alice@example.org", password="password")
             self.check.priority  = 1
