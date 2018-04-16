@@ -167,12 +167,14 @@ def profile(request):
             if form.is_valid():
 
                 email = form.cleaned_data["email"]
+                check_name = form.cleaned_data["check"]
                 try:
                     user = User.objects.get(email=email)
+                    check = Check.objects.filter(name=check_name).first()
                 except User.DoesNotExist:
                     user = _make_user(email)
 
-                profile.invite(user)
+                profile.invite(user,check)
                 messages.success(request, "Invitation to %s sent!" % email)
         elif "remove_team_member" in request.POST:
             form = RemoveTeamMemberForm(request.POST)
@@ -198,8 +200,12 @@ def profile(request):
                 messages.success(request, "Team Name updated!")
 
     tags = set()
+    checks = []
     for check in Check.objects.filter(user=request.team.user):
         tags.update(check.tags_list())
+        checks.append(check.to_dict())
+
+
 
     username = request.team.user.username
     badge_urls = []
@@ -213,6 +219,7 @@ def profile(request):
         "page": "profile",
         "badge_urls": badge_urls,
         "profile": profile,
+        "checks":checks,
         "show_api_key": show_api_key
     }
 
