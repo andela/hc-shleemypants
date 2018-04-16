@@ -1,6 +1,6 @@
 from django import forms
 from .models import PostsCategory, Post, Comment
-
+from django_markdown.widgets import MarkdownWidget
 # forms for the blog
 
 class BlogPostsCategoryForm(forms.ModelForm):
@@ -11,6 +11,7 @@ class BlogPostsCategoryForm(forms.ModelForm):
 class BlogPostsForm(forms.ModelForm):
     class Meta:
         model = Post
+        
         fields = ('category', 'title','body')
 
 class CommentForm(forms.ModelForm):

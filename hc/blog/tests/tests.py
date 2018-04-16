@@ -11,11 +11,14 @@ from django.utils import timezone
 """
 class BlogTestCase(BaseTestCase):
     def setUp(self):
-        self.client.login(username="alice@example.org", password="password")
+        
+        res = self.client.login(username="alice@example.org", password="password")
         self.category = PostsCategory(title='Artificial intelligence')
         self.category.save()
+        self.user = User(username="alice", email="alice@example.org")
+        self.user.save()
         self.blog = Post(title='Django newbies', body='Welcomes all newbies to django', 
-                        category=self.category, author=self.alice)
+                        category=self.category, author= self.user)
         self.blog.save()
 
     
@@ -25,16 +28,9 @@ class BlogTestCase(BaseTestCase):
         self.assertEqual('Django newbies', blog.title)
 
 
-    # def test_create_category(self):
-    #     url = reverse('blog:hc-category')
-    #     data = {'create_category-title': ['learn'], 'create_category': ['']}
-    #     response = self.client.post(url, data)
-    #     category = PostsCategory.objects.filter(title='read').first()
-    #     self.assertEqual('learn', category.title)
-
-
-    # def test_home_page_returns_all_categories(self):
-    #     url = reverse('blog:hc-category')
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'blog/view_blogs.html')
+    def test_create_category(self):
+        url = reverse('blog:hc-category')
+        data = {'create_category-title': ['learn'], 'create_category': ['']}
+        response = self.client.post(url, data)
+        category = PostsCategory.objects.filter(title='learn').first()
+        self.assertEqual('learn', category.title)

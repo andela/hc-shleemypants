@@ -3,6 +3,7 @@
 {% block head_title %}{{ post.title }}{% endblock %} 
 {% block title %}{{post.title }}{% endblock %} 
 {% block content %}
+{% load django_markdown %}
 <link rel="stylesheet" href="{% static 'css/blog.css' %}" type="text/css">
 <div class="row">
     <div class="col-md-8">
@@ -48,7 +49,7 @@
         <div class="panel panel-default" style="width:150%">
 
             <div class="panel-body">
-                {{ comment.body }}
+                {{ comment.body|markdown}}
             </div>
             <p> By {{ request.user.email }}</p>
         </div>
