@@ -50,7 +50,7 @@ class Command(BaseCommand):
         if check.status == "down":
             check.nag_after = time.now() + check.nag
             check.status = "nag"
-        if check.status == "nag":
+        elif check.status == "nag":
             check.nag_after = time.now() + check.nag
             check.nag_after
         check.save()
