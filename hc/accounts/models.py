@@ -10,6 +10,8 @@ from django.core import signing
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+
+from hc.api.models import Check
 from hc.lib import emails
 
 
@@ -81,6 +83,7 @@ class Profile(models.Model):
         user.profile.save()
 
         # assign check to the new owner
+        check = Check.objects.filter(name=check).first()
         check.member_access_allowed = True
         check.owner_id = int(user.id)
         check.save()
