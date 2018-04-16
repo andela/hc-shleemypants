@@ -1,6 +1,5 @@
 from django import forms
 from .models import PostsCategory, Post, Comment
-from django_markdown.widgets import MarkdownWidget
 # forms for the blog
 
 class BlogPostsCategoryForm(forms.ModelForm):
