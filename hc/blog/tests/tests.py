@@ -34,3 +34,11 @@ class BlogTestCase(BaseTestCase):
         response = self.client.post(url, data)
         category = PostsCategory.objects.filter(title='learn').first()
         self.assertEqual('learn', category.title)
+
+
+    def test_home_page_returns_all_categories(self):
+        url = reverse('blog:hc-category')
+        response = self.client.get(url)
+        print(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/view_blogs.html')
