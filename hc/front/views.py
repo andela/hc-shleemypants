@@ -31,7 +31,7 @@ def pairwise(iterable):
 def my_checks(request):
     q = Check.objects.filter(user=request.team.user).order_by("created")
     checks = list(q)
-
+    departments = set()
     counter = Counter()
     down_tags, grace_tags = set(), set()
     for check in checks:
@@ -46,7 +46,10 @@ def my_checks(request):
                 down_tags.add(tag)
             elif check.in_grace_period():
                 grace_tags.add(tag)
-
+    for check in checks:
+        if check.departments == "":
+            continue
+        departments.add(check.departments)
     ctx = {
         "page": "checks",
         "checks": checks,
@@ -54,7 +57,8 @@ def my_checks(request):
         "tags": counter.most_common(),
         "down_tags": down_tags,
         "grace_tags": grace_tags,
-        "ping_endpoint": settings.PING_ENDPOINT
+        "ping_endpoint": settings.PING_ENDPOINT,
+        "departments": departments
     }
 
     return render(request, "front/my_checks.html", ctx)
@@ -146,6 +150,7 @@ def update_name(request, code):
     if form.is_valid():
         check.name = form.cleaned_data["name"]
         check.tags = form.cleaned_data["tags"]
+        check.departments = form.cleaned_data["departments"]
         check.save()
 
     return redirect("hc-checks")

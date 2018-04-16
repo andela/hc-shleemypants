@@ -112,7 +112,7 @@ $(function () {
     nagSlider.noUiSlider.on("update", function(a, b, value) {
         var rounded = Math.round(value);
         $("#nag-slider-value").text(secsToText(rounded));
-        $("#update-timeout-grace").val(rounded);
+        $("#update-timeout-nag").val(rounded);
     });
 
 
@@ -124,6 +124,7 @@ $(function () {
         $("#update-name-form").attr("action", $this.data("url"));
         $("#update-name-input").val($this.data("name"));
         $("#update-tags-input").val($this.data("tags"));
+        $("#update-departments-input").val($this.data("departments"));
         $('#update-name-modal').modal("show");
         $("#update-name-input").focus();
 
@@ -137,7 +138,6 @@ $(function () {
         periodSlider.noUiSlider.set($this.data("timeout"))
         graceSlider.noUiSlider.set($this.data("grace"))
         nagSlider.noUiSlider.set($this.data("nag"))
-
         $('#update-timeout-modal').modal({"show":true, "backdrop":"static"});
 
         return false;
@@ -176,6 +176,43 @@ $(function () {
             var tags = $(".my-checks-name", element).data("tags").split(" ");
             for (var i=0, tag; tag=checked[i]; i++) {
                 if (tags.indexOf(tag) == -1) {
+                    $(element).hide();
+                    return;
+                }
+            }
+
+            $(element).show();
+        }
+
+        // Desktop: for each row, see if it needs to be shown or hidden
+        $("#checks-table tr.checks-row").each(applyFilters);
+        // Mobile: for each list item, see if it needs to be shown or hidden
+        $("#checks-list > li").each(applyFilters);
+
+    });
+
+    $("#my-checks-departments button").click(function() {
+        // .active has not been updated yet by bootstrap code,
+        // so cannot use it
+        $(this).toggleClass('checked');
+
+        // Make a list of currently checked departments:
+        var checked = [];
+        $("#my-checks-departments button.checked").each(function(index, el) {
+            checked.push(el.textContent);
+        });
+
+        // No checked tags: show all
+        if (checked.length == 0) {
+            $("#checks-table tr.checks-row").show();
+            $("#checks-list > li").show();
+            return;
+        }
+
+        function applyFilters(index, element) {
+            var departments = $(".my-checks-name", element).data("departments").split(" ");
+            for (var i=0, department; department=checked[i]; i++) {
+                if (departments.indexOf(department) == -1) {
                     $(element).hide();
                     return;
                 }

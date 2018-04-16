@@ -18,15 +18,14 @@
     <div class=" col-sm-12 cs-dptmnt">
       <p>Departments</p>
     </div>
-    <div class="col-sm-12" id="my-checks-tags" style="padding-bottom: 10px;">
-      <button aria-pressed="false" class="btn btn-default btn-xs cs-dep" data-toggle="button">Finance</button>
-      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Learning</button>
-      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Success</button>
-      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Technology</button>
-      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Strategy</button>
-      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Revenue</button>
-      <button aria-pressed="true" class="btn btn-default btn-xs cs-dep active" data-toggle="button">Talent</button>
+
+    {% if departments %}
+    <div id="my-checks-departments" class="col-sm-12">
+        {% for department in departments %}
+            <button class="btn btn-default btn-xs cs-dep" data-toggle="button">{{ department }}</button>
+        {% endfor %}
     </div>
+    {% endif %}
 
     {% if tags %}
     <div id="my-checks-tags" class="col-sm-12">
@@ -110,6 +109,25 @@
                                 <span class="help-block">
                                     Optionally, assign tags for easy filtering.
                                     Separate multiple tags with spaces.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="update-departments-input" class="col-sm-2 control-label">
+                                Departments
+                            </label>
+                            <div class="col-sm-9">
+                                <input
+                                    id="update-departments-input"
+                                    name="departments"
+                                    type="text"
+                                    value=""
+                                    placeholder="IT marketing"
+                                    class="form-control" />
+
+                                <span class="help-block">
+                                    Assign your check a department.
                                 </span>
                             </div>
                         </div>
