@@ -39,6 +39,19 @@ class BlogTestCase(BaseTestCase):
     def test_home_page_returns_all_categories(self):
         url = reverse('blog:hc-category')
         response = self.client.get(url)
-        print(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/view_blogs.html')
+
+    def test_create_category_form_invalid(self):
+        url = reverse('blog:hc-category')
+        data = {'create_category-title': [''], 'create_category': ['']}
+        response = self.client.post(url, data)
+        self.assertRedirects(response, '/blog/')
+        self.assertEqual(response.status_code, 302)
+
+   
+    def test_if_get_redirect(self):
+        url = reverse('blog:hc-category')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/view_blogs.html')
