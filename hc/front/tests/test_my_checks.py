@@ -63,6 +63,7 @@ class MyChecksTestCase(BaseTestCase):
         def test_default_priority_is_normal(self):
             self.client.login(username="alice@example.org", password="password")
             self.assertEqual(self.check.priority, 0)
+            self.assertEqual(self.check.priority_name, normal)
 
         def test_it_sets_priority(self):
             self.client.login(username="alice@example.org", password="password")
