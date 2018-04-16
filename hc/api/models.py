@@ -91,7 +91,13 @@ class Check(models.Model):
         self.status = "often"
         self.send_alert()
         self.status = "up"
-        
+
+    # def nag_team_member(self):
+    #     """Notify when a check has gone down for an extended period"""
+    #     if self.status == "nag":
+    #         self.send_alert()
+    #     return ""
+
     def get_status(self):
         if self.status in ("new", "paused"):
             return self.status
@@ -101,13 +107,10 @@ class Check(models.Model):
         if self.last_ping + self.timeout + self.grace > now:
             return "up"
 
-        if self.often and now - self.last_ping < self.timeout + self.grace:
-            return "often"
-        
-        if self.last_ping + self.timeout + self.nag > now:
+        elif self.last_ping + self.timeout + self.grace + self.nag < now:
             return "nag"
-
-        return "down"
+        else:
+            return "down"
 
     def in_grace_period(self):
         if self.status in ("new", "paused"):
