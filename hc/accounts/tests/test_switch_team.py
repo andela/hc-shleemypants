@@ -6,6 +6,8 @@ class SwitchTeamTestCase(BaseTestCase):
 
     def test_it_switches(self):
         c = Check(user=self.alice, name="This belongs to Alice")
+        c.member_access_allowed = True
+        c.owner_id = self.bob.id
         c.save()
 
         self.client.login(username="bob@example.org", password="password")
