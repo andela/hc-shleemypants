@@ -4,7 +4,9 @@ $(function () {
     var HOUR = {name: "hour", nsecs: MINUTE.nsecs * 60};
     var DAY = {name: "day", nsecs: HOUR.nsecs * 24};
     var WEEK = {name: "week", nsecs: DAY.nsecs * 7};
-    var UNITS = [WEEK, DAY, HOUR, MINUTE];
+    var MONTH = {name: "month", nsecs: WEEK.nsecs * 4};
+    var YEAR = {name: "year", nsecs: MONTH.nsecs * 12};
+    var UNITS = [YEAR, MONTH, WEEK, DAY, HOUR, MINUTE];
 
     var secsToText = function(total) {
         var remainingSeconds = Math.floor(total);
@@ -32,18 +34,19 @@ $(function () {
 
     var periodSlider = document.getElementById("period-slider");
     noUiSlider.create(periodSlider, {
-        start: [20],
+        start: [5],
         connect: "lower",
         range: {
             'min': [60, 60],
-            '33%': [3600, 3600],
-            '66%': [86400, 86400],
-            '83%': [604800, 604800],
-            'max': 2592000,
+            '20%': [3600, 3600],
+            '40%': [86400, 86400],
+            '60%': [604800, 604800],
+            '75%': [2419200, 2419200],
+            'max': 29030400,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000],
+            values: [60, 3600, 86400, 604800, 2419200, 29030400],
             density: 4,
             format: {
                 to: secsToText,
@@ -61,18 +64,19 @@ $(function () {
 
     var graceSlider = document.getElementById("grace-slider");
     noUiSlider.create(graceSlider, {
-        start: [20],
+        start: [0],
         connect: "lower",
         range: {
             'min': [60, 60],
-            '33%': [3600, 3600],
-            '66%': [86400, 86400],
-            '83%': [604800, 604800],
-            'max': 2592000,
+            '20%': [3600, 3600],
+            '40%': [86400, 86400],
+            '60%': [604800, 604800],
+            '75%': [2419200, 2419200],
+            'max': 29030400,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000],
+            values: [60, 3600, 86400, 604800, 2419200, 29030400],
             density: 4,
             format: {
                 to: secsToText,

@@ -108,10 +108,14 @@ class Check(models.Model):
         if self.last_ping + self.timeout + self.grace > now:
             return "up"
 
-        elif self.last_ping + self.timeout + self.grace + self.nag < now:
+        if self.often and ((now - self.last_ping) < (self.timeout + self.grace)):
+            return "often"
+
+        if self.last_ping + self.timeout + self.grace + self.nag < now:
             return "nag"
-        else:
-            return "down"
+
+        return "down"
+
 
     def in_grace_period(self):
         if self.status in ("new", "paused"):

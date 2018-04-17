@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+
 from hc.api.models import Check
 from hc.test import BaseTestCase
 from datetime import timedelta as td
@@ -27,7 +29,7 @@ class MyChecksTestCase(BaseTestCase):
 
         # Desktop
         self.assertContains(r, "icon-up")
-
+    #
         # Mobile
         self.assertContains(r, "label-success")
 
@@ -58,3 +60,65 @@ class MyChecksTestCase(BaseTestCase):
 
         # Mobile
         self.assertContains(r, "label-warning")
+
+    def test_it_counts_renders_unresolved_checks(self):
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
+        self.check.status = "up"
+        self.check.save()
+
+        self.client.login(username="alice@example.org", password="password")
+        r = self.client.get("/checks/")
+
+        self.assertEqual(len(r.context[0]["unresolved"]), 1)
+
+    def test_it_counts_running_checks(self):
+        self.check.last_ping = timezone.now()
+        self.check.status = "up"
+        self.check.save()
+
+        check2 = Check(user=self.alice, name="Monitor my db update")
+        check2.last_ping = timezone.now()
+        check2.status = "up"
+        check2.save()
+
+        self.client.login(username="alice@example.org", password="password")
+        r = self.client.get("/checks/")
+        self.assertEqual(len(r.context[0]["up"]), 2)
+
+    def test_it_shows_no_checks_when_empty(self):
+        samjunior = User(username="samaki", email="samjunior@fishnet.com")
+        samjunior.set_password("password")
+        samjunior.save()
+
+        self.client.login(username="samjunior@fishnet.com", password="password")
+        r = self.client.get("/checks/")
+        self.assertContains(r, 'You don\'t have any checks yet.')
+
+    def test_it_shows_no_checks_running_when_empty(self):
+        samjunior = User(username="samaki", email="samjunior@fishnet.com")
+        samjunior.set_password("password")
+        samjunior.save()
+
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
+        self.check.user = samjunior
+        self.check.status = "up"
+        self.check.save()
+
+        self.client.login(username="samjunior@fishnet.com", password="password")
+        r = self.client.get("/checks/")
+
+        self.assertContains(r, 'You don\'t have any running checks.')
+
+    def test_it_shows_no_checks_unresolved_when_empty(self):
+        samjunior = User(username="samaki", email="samjunior@fishnet.com")
+        samjunior.set_password("password")
+        samjunior.save()
+
+        self.check.last_ping = timezone.now()
+        self.check.user = samjunior
+        self.check.status = "up"
+        self.check.save()
+
+        self.client.login(username="samjunior@fishnet.com", password="password")
+        r = self.client.get("/checks/")
+        self.assertContains(r, 'You don\'t have any unresolved checks')
