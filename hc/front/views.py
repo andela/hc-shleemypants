@@ -47,17 +47,17 @@ def my_checks(request):
                 down_tags.add(tag)
             elif check.in_grace_period():
                 grace_tags.add(tag)
-<<<<<<< HEAD
+
     for check in checks:
         if check.departments == "":
             continue
         departments.add(check.departments)
-=======
+
 
     unresolved = [new_check for new_check in checks if new_check.get_status() == "down"]
     up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new"]
 
->>>>>>> ft-impement-nag-notifications-155965537
+
     ctx = {
         "page": "checks",
         "up": up,
