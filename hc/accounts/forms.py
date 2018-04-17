@@ -12,10 +12,10 @@ class EmailPasswordForm(forms.Form):
     email = LowercaseEmailField()
     password = forms.CharField(required=False)
 
-
 class ReportSettingsForm(forms.Form):
     reports_allowed = forms.BooleanField(required=False)
 
+    report_freqs = forms.CharField(required=False)
 
 class SetPasswordForm(forms.Form):
     password = forms.CharField()

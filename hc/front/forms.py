@@ -5,6 +5,7 @@ from hc.api.models import Channel
 class NameTagsForm(forms.Form):
     name = forms.CharField(max_length=100, required=False)
     tags = forms.CharField(max_length=500, required=False)
+    departments = forms.CharField(max_length=500, required=False)
 
     def clean_tags(self):
         l = []
@@ -20,6 +21,8 @@ class NameTagsForm(forms.Form):
 class TimeoutForm(forms.Form):
     timeout = forms.IntegerField(min_value=60, max_value=2592000)
     grace = forms.IntegerField(min_value=60, max_value=2592000)
+    nag = forms.IntegerField(min_value=60, max_value=2592000)
+
 
 
 class AddChannelForm(forms.ModelForm):
@@ -41,3 +44,7 @@ class AddWebhookForm(forms.Form):
 
     def get_value(self):
         return "{value_down}\n{value_up}".format(**self.cleaned_data)
+
+class PriorityForm(forms.Form):
+    team = forms.CharField(max_length=500, required=False)
+    selected_priority = forms.IntegerField(min_value=-2, max_value=2) 

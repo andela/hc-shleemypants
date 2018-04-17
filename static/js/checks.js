@@ -4,7 +4,25 @@ $(function () {
     var HOUR = {name: "hour", nsecs: MINUTE.nsecs * 60};
     var DAY = {name: "day", nsecs: HOUR.nsecs * 24};
     var WEEK = {name: "week", nsecs: DAY.nsecs * 7};
-    var UNITS = [WEEK, DAY, HOUR, MINUTE];
+    var MONTH = {name: "month", nsecs: WEEK.nsecs * 4};
+    var YEAR = {name: "year", nsecs: MONTH.nsecs * 12};
+    var UNITS = [YEAR, MONTH, WEEK, DAY, HOUR, MINUTE];
+
+    var select = document.getElementById('input-select');
+    var priorities = {}
+    priorities[-2] = "Lowest";
+    priorities[-1] =  "Low";
+    priorities[0]  = "Normal";
+    priorities[1]  = "High";
+    priorities[2]  = "Emergency";
+
+    for ([k,v] of Object.entries(priorities)) {
+        var option   = document.createElement("option");
+        option.text  = v;
+        option.value = k;
+
+        select.appendChild(option);
+    }
 
     var secsToText = function(total) {
         var remainingSeconds = Math.floor(total);
@@ -32,18 +50,19 @@ $(function () {
 
     var periodSlider = document.getElementById("period-slider");
     noUiSlider.create(periodSlider, {
-        start: [20],
+        start: [5],
         connect: "lower",
         range: {
             'min': [60, 60],
-            '33%': [3600, 3600],
-            '66%': [86400, 86400],
-            '83%': [604800, 604800],
-            'max': 2592000,
+            '20%': [3600, 3600],
+            '40%': [86400, 86400],
+            '60%': [604800, 604800],
+            '75%': [2419200, 2419200],
+            'max': 29030400,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000],
+            values: [60, 3600, 86400, 604800, 2419200, 29030400],
             density: 4,
             format: {
                 to: secsToText,
@@ -61,6 +80,35 @@ $(function () {
 
     var graceSlider = document.getElementById("grace-slider");
     noUiSlider.create(graceSlider, {
+        start: [0],
+        connect: "lower",
+        range: {
+            'min': [60, 60],
+            '20%': [3600, 3600],
+            '40%': [86400, 86400],
+            '60%': [604800, 604800],
+            '75%': [2419200, 2419200],
+            'max': 29030400,
+        },
+        pips: {
+            mode: 'values',
+            values: [60, 3600, 86400, 604800, 2419200, 29030400],
+            density: 4,
+            format: {
+                to: secsToText,
+                from: function() {}
+            }
+        }
+    });
+
+    graceSlider.noUiSlider.on("update", function(a, b, value) {
+        var rounded = Math.round(value);
+        $("#grace-slider-value").text(secsToText(rounded));
+        $("#update-timeout-grace").val(rounded);
+    });
+
+    var nagSlider = document.getElementById("nag-slider");
+    noUiSlider.create(nagSlider, {
         start: [20],
         connect: "lower",
         range: {
@@ -81,10 +129,10 @@ $(function () {
         }
     });
 
-    graceSlider.noUiSlider.on("update", function(a, b, value) {
+    nagSlider.noUiSlider.on("update", function(a, b, value) {
         var rounded = Math.round(value);
-        $("#grace-slider-value").text(secsToText(rounded));
-        $("#update-timeout-grace").val(rounded);
+        $("#nag-slider-value").text(secsToText(rounded));
+        $("#update-timeout-nag").val(rounded);
     });
 
 
@@ -96,6 +144,7 @@ $(function () {
         $("#update-name-form").attr("action", $this.data("url"));
         $("#update-name-input").val($this.data("name"));
         $("#update-tags-input").val($this.data("tags"));
+        $("#update-departments-input").val($this.data("departments"));
         $('#update-name-modal').modal("show");
         $("#update-name-input").focus();
 
@@ -108,6 +157,7 @@ $(function () {
         $("#update-timeout-form").attr("action", $this.data("url"));
         periodSlider.noUiSlider.set($this.data("timeout"))
         graceSlider.noUiSlider.set($this.data("grace"))
+        nagSlider.noUiSlider.set($this.data("nag"))
         $('#update-timeout-modal').modal({"show":true, "backdrop":"static"});
 
         return false;
@@ -161,6 +211,43 @@ $(function () {
 
     });
 
+    $("#my-checks-departments button").click(function() {
+        // .active has not been updated yet by bootstrap code,
+        // so cannot use it
+        $(this).toggleClass('checked');
+
+        // Make a list of currently checked departments:
+        var checked = [];
+        $("#my-checks-departments button.checked").each(function(index, el) {
+            checked.push(el.textContent);
+        });
+
+        // No checked tags: show all
+        if (checked.length == 0) {
+            $("#checks-table tr.checks-row").show();
+            $("#checks-list > li").show();
+            return;
+        }
+
+        function applyFilters(index, element) {
+            var departments = $(".my-checks-name", element).data("departments").split(" ");
+            for (var i=0, department; department=checked[i]; i++) {
+                if (departments.indexOf(department) == -1) {
+                    $(element).hide();
+                    return;
+                }
+            }
+
+            $(element).show();
+        }
+
+        // Desktop: for each row, see if it needs to be shown or hidden
+        $("#checks-table tr.checks-row").each(applyFilters);
+        // Mobile: for each list item, see if it needs to be shown or hidden
+        $("#checks-list > li").each(applyFilters);
+
+    });
+
     $(".pause-check").click(function(e) {
         var url = e.target.getAttribute("data-url");
         $("#pause-form").attr("action", url).submit();
@@ -196,6 +283,58 @@ $(function () {
     clipboard.on('error', function(e) {
         var text = e.trigger.getAttribute("data-clipboard-text");
         prompt("Press Ctrl+C to select:", text)
+    });
+
+    $(".priority-cell").click(function() {
+        var $this = $(this);
+        var buttonPriority = $this.find("button").data("url")
+        $("#update-priority-form").attr("action", buttonPriority)
+        var priorityNbr = $this.find("button").data("priority")
+        $("#priority-slider").attr("data-sliderstart", priorityNbr)
+        $("#input-select").val(priorityNbr)
+        // Slider
+        //Creating a Slider to  display the different priorities
+    var priorityslider = document.getElementById('priority-slider');
+    var startSlider = $("#priority-slider");
+
+    noUiSlider.create(priorityslider, {
+        start: [startSlider.attr("data-sliderstart")],
+        connect: "lower",
+        range: {
+            min: -2,
+            max: 2
+        },
+        pips:{
+            mode: "values",
+            values: [-2,-1,0,1,2],
+            density: 100
+
+        }
+    }, true);
+
+    priorityslider.noUiSlider.on('update', function( values, handle ) {
+        var value = values[handle];
+
+        if ( handle ) {
+            inputPriority.value = value;
+        } else {
+            select.value = Math.round(value);
+        }
+    });
+
+    select.addEventListener('change', function(){
+        priorityslider.noUiSlider.set([this.value, null]);
+    });
+        // Slider
+        $("#priority-modal").modal({ show: true, backdrop: "static" });
+        $("#show-advanced-time").modal("hide");
+
+        return false;
+    });
+
+    $(".destroySlider").click(function(){
+        var priorityslider = document.getElementById('priority-slider');
+        priorityslider.noUiSlider.destroy()
     });
 
 

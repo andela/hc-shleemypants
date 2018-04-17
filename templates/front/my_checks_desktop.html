@@ -1,7 +1,4 @@
 {% load hc_extras humanize %}
-
-
-
 <div class="tab-content hidden-xs">
     <div class="tab-pane active" id="ok_desktop">
     {% if up %}
@@ -10,9 +7,11 @@
         <th></th>
         <th class="th-name">Name</th>
         <th>Ping URL</th>
+        <th>Priority</th>
         <th class="th-period">
             Period <br />
             <span class="checks-subline">Grace</span>
+            <span class="checks-sub-subline">Nag</span>
         </th>
         <th>Last Ping</th>
         <th></th>
@@ -33,11 +32,16 @@
                 <span class="status icon-up"></span>
             {% elif check.get_status == "down" %}
                 <span class="status icon-down"></span>
+            {% elif check.get_status == "nag" %}
+                <span class="status icon-bullhorn"></span>
+            {% elif check.get_status == "often" %}
+                <span class="fa fa-history"></span>
             {% endif %}
         </td>
         <td class="name-cell">
             <div data-name="{{ check.name }}"
                     data-tags="{{ check.tags }}"
+                    data-departments="{{ check.departments }}"
                     data-url="{% url 'hc-update-name' check.code %}"
                     class="my-checks-name {% if not check.name %}unnamed{% endif %}">
                 <div>{{ check.name|default:"unnamed" }}</div>
@@ -61,11 +65,16 @@
                 data-url="{% url 'hc-update-timeout' check.code %}"
                 data-timeout="{{ check.timeout.total_seconds }}"
                 data-grace="{{ check.grace.total_seconds }}"
+                data-nag="{{ check.nag.total_seconds }}"
                 class="timeout-grace">
                 {{ check.timeout|hc_duration }}
                 <br />
                 <span class="checks-subline">
                 {{ check.grace|hc_duration }}
+                </span>
+                <br/>
+                <span class="checks-sub-subline">
+                {{ check.nag|hc_duration }}
                 </span>
             </span>
         </td>
@@ -167,6 +176,16 @@
                 data-clipboard-text="{{ check.url }}">
                 copy
             </button>
+        </td>
+        <td class="priority-cell">
+            <button type="button" class="btn btn-info" data-priority="{{ check.priority }}"
+                data-url="{% url 'hc-check-priority' check.code %}">
+            {% if check.priority %}
+                {{check.priority_name|capfirst}}
+            {% else %}
+                Normal
+             {% endif %}
+           </button>
         </td>
         <td class="timeout-cell">
             <span

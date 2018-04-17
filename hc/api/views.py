@@ -23,6 +23,15 @@ def ping(request, code):
 
     check.n_pings = F("n_pings") + 1
     check.last_ping = timezone.now()
+    if check.last_ping:
+        if (check.timeout == check.grace) and (timezone.now() - check.last_ping) < check.timeout:
+            check.often = True
+            check.alert_run_too_often()
+        elif check.last_ping < timezone.now() and (check.last_ping + check.timeout - check.grace) > timezone.now():
+            check.often = True
+            check.alert_run_too_often()
+        else:
+            check.often = False
     if check.status in ("new", "paused"):
         check.status = "up"
 
@@ -62,6 +71,8 @@ def checks(request):
             check.timeout = td(seconds=request.json["timeout"])
         if "grace" in request.json:
             check.grace = td(seconds=request.json["grace"])
+        if "nag" in request.json:
+            check.nag = td(seconds=request.json["nag"])
 
         check.save()
 
@@ -104,11 +115,17 @@ def badge(request, username, signature, tag):
         if tag not in check.tags_list():
             continue
 
+        if check.get_status() == "up":
+            status = "often"
+
         if status == "up" and check.in_grace_period():
             status = "late"
 
         if check.get_status() == "down":
             status = "down"
+
+        if check.get_status() == "down" and check.in_nag_period():
+            status = "nag"
             break
 
     svg = get_badge_svg(tag, status)

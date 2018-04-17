@@ -4,6 +4,7 @@ from hc.api.models import Check
 from hc.test import BaseTestCase
 from datetime import timedelta as td
 from django.utils import timezone
+from hc.front.forms import PriorityForm
 
 
 class MyChecksTestCase(BaseTestCase):
@@ -36,7 +37,7 @@ class MyChecksTestCase(BaseTestCase):
         self.assertContains(r, "label-success")
 
     def test_it_shows_red_check(self):
-        self.check.last_ping = timezone.now() - td(days=3)
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
         self.check.status = "up"
         self.check.save()
 
@@ -50,7 +51,7 @@ class MyChecksTestCase(BaseTestCase):
         self.assertContains(r, "label-danger")
 
     def test_it_shows_amber_check(self):
-        self.check.last_ping = timezone.now() - td(days=1, minutes=30)
+        self.check.last_ping = timezone.now() - (td(days=1) + td(minutes=35))
         self.check.status = "up"
         self.check.save()
 
@@ -63,14 +64,16 @@ class MyChecksTestCase(BaseTestCase):
         # Mobile
         self.assertContains(r, "label-warning")
 
+
     def test_it_counts_renders_unresolved_checks(self):
-        self.check.last_ping = timezone.now() - td(weeks=3)
-        self.check.status = "down"
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
+        self.check.status = "up"
         self.check.save()
 
         self.client.login(username="alice@example.org", password="password")
         r = self.client.get("/checks/")
-        self.assertEqual(len(r.context[0]["unresolved"]),1)
+
+        self.assertEqual(len(r.context[0]["unresolved"]), 1)
 
     def test_it_counts_running_checks(self):
         self.check.last_ping = timezone.now()
@@ -100,13 +103,14 @@ class MyChecksTestCase(BaseTestCase):
         samjunior.set_password("password")
         samjunior.save()
 
-        self.check.last_ping = timezone.now() - td(days=12)
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
         self.check.user = samjunior
-        self.check.status = "down"
+        self.check.status = "up"
         self.check.save()
 
         self.client.login(username="samjunior@fishnet.com", password="password")
         r = self.client.get("/checks/")
+
         self.assertContains(r, 'You don\'t have any running checks.')
 
     def test_it_shows_no_checks_unresolved_when_empty(self):
@@ -122,3 +126,16 @@ class MyChecksTestCase(BaseTestCase):
         self.client.login(username="samjunior@fishnet.com", password="password")
         r = self.client.get("/checks/")
         self.assertContains(r, 'You don\'t have any unresolved checks')
+
+    def test_default_priority_is_normal(self):
+        self.client.login(username="alice@example.org", password="password")
+        self.assertEqual(self.check.priority, 0)
+        self.assertEqual(self.check.priority_name, 'normal')
+
+    def test_it_sets_priority(self):
+        self.client.login(username="alice@example.org", password="password")
+        self.check.priority  = 1
+        self.check.save()
+        self.client.post("/checks/{}/priority/".format(self.check.code),{'selected_priority':2})
+        self.check.refresh_from_db()
+        self.assertEqual(self.check.priority, 2)
