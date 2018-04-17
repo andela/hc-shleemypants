@@ -55,7 +55,7 @@ def my_checks(request):
 
 
     unresolved = [new_check for new_check in checks if new_check.get_status() == "down"]
-    up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new"]
+    up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new" or check.get_status() == "late"]
 
 
     ctx = {

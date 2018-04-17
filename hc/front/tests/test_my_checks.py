@@ -49,7 +49,7 @@ class MyChecksTestCase(BaseTestCase):
         self.assertContains(r, "label-danger")
 
     def test_it_shows_amber_check(self):
-        self.check.last_ping = timezone.now() - td(days=1, minutes=30)
+        self.check.last_ping = timezone.now() - (td(days=1) + td(minutes=35))
         self.check.status = "up"
         self.check.save()
 
@@ -137,5 +137,3 @@ class MyChecksTestCase(BaseTestCase):
         self.client.post("/checks/{}/priority/".format(self.check.code),{'selected_priority':2})
         self.check.refresh_from_db()
         self.assertEqual(self.check.priority, 2)
-
-
