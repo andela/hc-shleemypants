@@ -16,7 +16,7 @@ from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm,
-                            TimeoutForm)
+                            TimeoutForm, PriorityForm)
 
 import telepot
 # from itertools recipes:
@@ -164,6 +164,18 @@ def update_timeout(request, code):
         check.grace = td(seconds=form.cleaned_data["grace"])
         check.save()
 
+    return redirect("hc-checks")
+
+@login_required
+@uuid_or_400
+def check_priority(request, code):
+    assert request.method == "POST"
+ 
+    check = get_object_or_404(Check, code=code)
+    form = PriorityForm(request.POST)
+    if form.is_valid():
+        check.priority = form.cleaned_data["selected_priority"]
+        check.save()
     return redirect("hc-checks")
 
 
