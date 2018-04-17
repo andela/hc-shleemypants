@@ -5,14 +5,18 @@ from hc.api.models import Check
 class SwitchTeamTestCase(BaseTestCase):
 
     def test_it_switches(self):
-        c = Check(user=self.alice, name="This belongs to Alice")
-        c.save()
+       
 
         self.client.login(username="bob@example.org", password="password")
-
+        c = Check(user=self.alice, name="This belongs to Alice")
+            
+        self.check.owner_id = self.bob.id
+        self.check.member_access_allowed=True
+        c.save()
+        
         url = "/accounts/switch_team/%s/" % self.alice.username
         r = self.client.get(url, follow=True)
-
+        
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "This belongs to Alice")
         self.assertRedirects(r, "/checks/")
