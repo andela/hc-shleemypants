@@ -14,9 +14,10 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
-from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
-from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm,
-                            TimeoutForm, PriorityForm)
+from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, DEFAULT_NAG, Channel, Check, Ping
+from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, TimeoutForm, PriorityForm)
+from .models import Question
+
 
 import telepot
 # from itertools recipes:
@@ -31,7 +32,7 @@ def pairwise(iterable):
 def my_checks(request):
     q = Check.objects.filter(user=request.team.user).order_by("created")
     checks = list(q)
-
+    departments = set()
     counter = Counter()
     down_tags, grace_tags = set(), set()
     for check in checks:
@@ -47,14 +48,26 @@ def my_checks(request):
             elif check.in_grace_period():
                 grace_tags.add(tag)
 
+    for check in checks:
+        if check.departments == "":
+            continue
+        departments.add(check.departments)
+
+
+    unresolved = [new_check for new_check in checks if new_check.get_status() == "down"]
+    up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new" or check.get_status() == "late"]
+
+
     ctx = {
         "page": "checks",
-        "checks": checks,
+        "up": up,
+        "unresolved":unresolved,
         "now": timezone.now(),
         "tags": counter.most_common(),
         "down_tags": down_tags,
         "grace_tags": grace_tags,
-        "ping_endpoint": settings.PING_ENDPOINT
+        "ping_endpoint": settings.PING_ENDPOINT,
+        "departments": departments
     }
 
     return render(request, "front/my_checks.html", ctx)
@@ -103,6 +116,20 @@ def docs(request):
 
     return render(request, "front/docs.html", ctx)
 
+def faqs(request):
+    check = _welcome_check(request)
+    question_list = Question.objects.all()
+
+    ctx = {
+        "page": "faqs",
+        "section": "home",
+        "ping_endpoint": settings.PING_ENDPOINT,
+        "check": check,
+        "ping_url": check.url(),
+        "question_list": question_list
+    }
+
+    return render(request, "front/faqs.html", ctx)
 
 def docs_api(request):
     ctx = {
@@ -111,7 +138,8 @@ def docs_api(request):
         "SITE_ROOT": settings.SITE_ROOT,
         "PING_ENDPOINT": settings.PING_ENDPOINT,
         "default_timeout": int(DEFAULT_TIMEOUT.total_seconds()),
-        "default_grace": int(DEFAULT_GRACE.total_seconds())
+        "default_grace": int(DEFAULT_GRACE.total_seconds()),
+        "default_nag": int(DEFAULT_NAG.total_seconds())
     }
 
     return render(request, "front/docs_api.html", ctx)
@@ -144,6 +172,7 @@ def update_name(request, code):
     if form.is_valid():
         check.name = form.cleaned_data["name"]
         check.tags = form.cleaned_data["tags"]
+        check.departments = form.cleaned_data["departments"]
         check.save()
 
     return redirect("hc-checks")
@@ -162,6 +191,7 @@ def update_timeout(request, code):
     if form.is_valid():
         check.timeout = td(seconds=form.cleaned_data["timeout"])
         check.grace = td(seconds=form.cleaned_data["grace"])
+        check.nag = td(seconds=form.cleaned_data["nag"])
         check.save()
 
     return redirect("hc-checks")

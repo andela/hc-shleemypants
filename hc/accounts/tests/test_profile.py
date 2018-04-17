@@ -36,6 +36,7 @@ class ProfileTestCase(BaseTestCase):
         self.assertEquals(200,  r.status_code)
 
         self.alice.profile.send_report(7)
+        
         self.assertGreater(len(mail.outbox), 0)
         self.assertIn(mail.outbox[0].subject, "Recent Reports")
         self.assertEqual(len(mail.outbox), 1)
@@ -129,4 +130,3 @@ class ProfileTestCase(BaseTestCase):
         self.profile.refresh_from_db()
         api_key = self.profile.api_key
         self.assertFalse(api_key is None)
-

@@ -4,7 +4,9 @@ $(function () {
     var HOUR = {name: "hour", nsecs: MINUTE.nsecs * 60};
     var DAY = {name: "day", nsecs: HOUR.nsecs * 24};
     var WEEK = {name: "week", nsecs: DAY.nsecs * 7};
-    var UNITS = [WEEK, DAY, HOUR, MINUTE];
+    var MONTH = {name: "month", nsecs: WEEK.nsecs * 4};
+    var YEAR = {name: "year", nsecs: MONTH.nsecs * 12};
+    var UNITS = [YEAR, MONTH, WEEK, DAY, HOUR, MINUTE];
 
     var select = document.getElementById('input-select');
     var priorities = {}
@@ -48,18 +50,19 @@ $(function () {
 
     var periodSlider = document.getElementById("period-slider");
     noUiSlider.create(periodSlider, {
-        start: [20],
+        start: [5],
         connect: "lower",
         range: {
             'min': [60, 60],
-            '33%': [3600, 3600],
-            '66%': [86400, 86400],
-            '83%': [604800, 604800],
-            'max': 2592000,
+            '20%': [3600, 3600],
+            '40%': [86400, 86400],
+            '60%': [604800, 604800],
+            '75%': [2419200, 2419200],
+            'max': 29030400,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000],
+            values: [60, 3600, 86400, 604800, 2419200, 29030400],
             density: 4,
             format: {
                 to: secsToText,
@@ -77,6 +80,35 @@ $(function () {
 
     var graceSlider = document.getElementById("grace-slider");
     noUiSlider.create(graceSlider, {
+        start: [0],
+        connect: "lower",
+        range: {
+            'min': [60, 60],
+            '20%': [3600, 3600],
+            '40%': [86400, 86400],
+            '60%': [604800, 604800],
+            '75%': [2419200, 2419200],
+            'max': 29030400,
+        },
+        pips: {
+            mode: 'values',
+            values: [60, 3600, 86400, 604800, 2419200, 29030400],
+            density: 4,
+            format: {
+                to: secsToText,
+                from: function() {}
+            }
+        }
+    });
+
+    graceSlider.noUiSlider.on("update", function(a, b, value) {
+        var rounded = Math.round(value);
+        $("#grace-slider-value").text(secsToText(rounded));
+        $("#update-timeout-grace").val(rounded);
+    });
+
+    var nagSlider = document.getElementById("nag-slider");
+    noUiSlider.create(nagSlider, {
         start: [20],
         connect: "lower",
         range: {
@@ -97,10 +129,10 @@ $(function () {
         }
     });
 
-    graceSlider.noUiSlider.on("update", function(a, b, value) {
+    nagSlider.noUiSlider.on("update", function(a, b, value) {
         var rounded = Math.round(value);
-        $("#grace-slider-value").text(secsToText(rounded));
-        $("#update-timeout-grace").val(rounded);
+        $("#nag-slider-value").text(secsToText(rounded));
+        $("#update-timeout-nag").val(rounded);
     });
 
 
@@ -112,6 +144,7 @@ $(function () {
         $("#update-name-form").attr("action", $this.data("url"));
         $("#update-name-input").val($this.data("name"));
         $("#update-tags-input").val($this.data("tags"));
+        $("#update-departments-input").val($this.data("departments"));
         $('#update-name-modal').modal("show");
         $("#update-name-input").focus();
 
@@ -124,6 +157,7 @@ $(function () {
         $("#update-timeout-form").attr("action", $this.data("url"));
         periodSlider.noUiSlider.set($this.data("timeout"))
         graceSlider.noUiSlider.set($this.data("grace"))
+        nagSlider.noUiSlider.set($this.data("nag"))
         $('#update-timeout-modal').modal({"show":true, "backdrop":"static"});
 
         return false;
@@ -162,6 +196,43 @@ $(function () {
             var tags = $(".my-checks-name", element).data("tags").split(" ");
             for (var i=0, tag; tag=checked[i]; i++) {
                 if (tags.indexOf(tag) == -1) {
+                    $(element).hide();
+                    return;
+                }
+            }
+
+            $(element).show();
+        }
+
+        // Desktop: for each row, see if it needs to be shown or hidden
+        $("#checks-table tr.checks-row").each(applyFilters);
+        // Mobile: for each list item, see if it needs to be shown or hidden
+        $("#checks-list > li").each(applyFilters);
+
+    });
+
+    $("#my-checks-departments button").click(function() {
+        // .active has not been updated yet by bootstrap code,
+        // so cannot use it
+        $(this).toggleClass('checked');
+
+        // Make a list of currently checked departments:
+        var checked = [];
+        $("#my-checks-departments button.checked").each(function(index, el) {
+            checked.push(el.textContent);
+        });
+
+        // No checked tags: show all
+        if (checked.length == 0) {
+            $("#checks-table tr.checks-row").show();
+            $("#checks-list > li").show();
+            return;
+        }
+
+        function applyFilters(index, element) {
+            var departments = $(".my-checks-name", element).data("departments").split(" ");
+            for (var i=0, department; department=checked[i]; i++) {
+                if (departments.indexOf(department) == -1) {
                     $(element).hide();
                     return;
                 }

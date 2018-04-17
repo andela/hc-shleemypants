@@ -15,6 +15,18 @@
         {% endif %}
         </h1>
     </div>
+    <div class=" col-sm-12 cs-dptmnt">
+      <p>Departments</p>
+    </div>
+
+    {% if departments %}
+    <div id="my-checks-departments" class="col-sm-12">
+        {% for department in departments %}
+            <button class="btn btn-default btn-xs cs-dep" data-toggle="button">{{ department }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {% if tags %}
     <div id="my-checks-tags" class="col-sm-12">
         {% for tag, count in tags %}
@@ -34,9 +46,26 @@
     <div class="col-sm-12">
 
 
-    {% if checks %}
-        {% include "front/my_checks_mobile.html" %}
+    {% if up or unresolved %}
+        <ul class="nav nav-tabs hidden-xs" role="tablist">
+                <li class="active">
+                    <a href="#ok_desktop" data-toggle="tab">Working </a>
+                </li>
+                <li>
+                    <a href="#unresolved_desktop" data-toggle="tab">Unresolved</a>
+                </li>
+            </ul>
+        <ul class="nav nav-tabs visible-xs" role="tablist">
+                <li class="active">
+                    <a href="#ok_mobile" data-toggle="tab">Working </a>
+                </li>
+                <li>
+                    <a href="#unresolved_mobile" data-toggle="tab">Unresolved</a>
+                </li>
+            </ul>
         {% include "front/my_checks_desktop.html" %}
+        {% include "front/my_checks_mobile.html" %}
+
     {% else %}
     <div class="alert alert-info">You don't have any checks yet.</div>
     {% endif %}
@@ -100,6 +129,25 @@
                                 </span>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label for="update-departments-input" class="col-sm-2 control-label">
+                                Departments
+                            </label>
+                            <div class="col-sm-9">
+                                <input
+                                    id="update-departments-input"
+                                    name="departments"
+                                    type="text"
+                                    value=""
+                                    placeholder="IT marketing"
+                                    class="form-control" />
+
+                                <span class="help-block">
+                                    Assign your check a department.
+                                </span>
+                            </div>
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -116,6 +164,7 @@
             {% csrf_token %}
             <input type="hidden" name="timeout" id="update-timeout-timeout" />
             <input type="hidden" name="grace" id="update-timeout-grace" />
+            <input type="hidden" name="nag" id="update-timeout-nag" />
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="update-timeout-info text-center">
@@ -131,6 +180,7 @@
                             1 day
                         </span>
                     </div>
+                    
                     <div id="period-slider"></div>
 
                     <div class="update-timeout-info text-center">
@@ -146,8 +196,22 @@
                             1 day
                         </span>
                     </div>
-
                     <div id="grace-slider"></div>
+
+                    <div class="update-timeout-info text-center">
+                        <span
+                            class="update-timeout-label"
+                            data-toggle="tooltip"
+                            title="When a check is down, duration between which nag alerts are sent">
+                            Nag Period
+                        </span>
+                        <span
+                            id="nag-slider-value"
+                            class="update-timeout-value">
+                            1 day
+                        </span>
+                    </div>
+                    <div id="nag-slider"></div>
 
                     <div class="update-timeout-terms">
                         <p>
@@ -157,6 +221,10 @@
                         <p>
                             <span>Grace Time</span>
                             When a check is late, how much time to wait until alert is sent.
+                        </p>
+                        <p>
+                            <span>Nag Period</span>
+                            When a check is down, duration between which nag alerts are sent.
                         </p>
                     </div>
 

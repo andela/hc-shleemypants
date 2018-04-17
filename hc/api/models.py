@@ -20,10 +20,12 @@ STATUSES = (
     ("down", "Down"),
     ("new", "New"),
     ("paused", "Paused"),
-    ("often", "Often")
+    ("often", "Often"),
+    ("nag", "Nag")
 )
 DEFAULT_TIMEOUT = td(days=1)
 DEFAULT_GRACE = td(hours=1)
+DEFAULT_NAG= td(minutes=1)
 CHANNEL_KINDS = (("email", "Email"), ("webhook", "Webhook"),
                  ("hipchat", "HipChat"),
                  ("slack", "Slack"), ("pd", "PagerDuty"), ("po", "Pushover"),
@@ -46,17 +48,21 @@ class Check(models.Model):
 
     name = models.CharField(max_length=100, blank=True)
     tags = models.CharField(max_length=500, blank=True)
+    departments = models.CharField(max_length=500, blank=True)
     code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     user = models.ForeignKey(User, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     timeout = models.DurationField(default=DEFAULT_TIMEOUT)
     grace = models.DurationField(default=DEFAULT_GRACE)
+    nag = models.DurationField(default=DEFAULT_NAG)
     n_pings = models.IntegerField(default=0)
     last_ping = models.DateTimeField(null=True, blank=True)
     alert_after = models.DateTimeField(null=True, blank=True, editable=False)
+    nag_after = models.DateTimeField(null=True,blank=True,editable=False)
     status = models.CharField(max_length=6, choices=STATUSES, default="new")
     often = models.BooleanField(default=False)
     priority = models.IntegerField(default=0)
+
 
     def name_then_code(self):
         if self.name:
@@ -74,7 +80,9 @@ class Check(models.Model):
         return "%s@%s" % (self.code, settings.PING_EMAIL_DOMAIN)
 
     def send_alert(self):
-        if self.status not in ("up", "down", "late", "often"):
+
+        if self.status not in ("up", "down", "late", "often", "nag"):
+
             raise NotImplementedError("Unexpected status: %s" % self.status)
 
         errors = []
@@ -90,7 +98,7 @@ class Check(models.Model):
         self.status = "often"
         self.send_alert()
         self.status = "up"
-        
+
     def get_status(self):
         if self.status in ("new", "paused"):
             return self.status
@@ -102,10 +110,14 @@ class Check(models.Model):
         elif self.last_ping + self.timeout + self.grace > now:
             return "late"
 
-        if self.often and now - self.last_ping < self.timeout + self.grace:
+        if self.often and ((now - self.last_ping) < (self.timeout + self.grace)):
             return "often"
 
+        if self.last_ping + self.timeout + self.grace + self.nag < now:
+            return "nag"
+
         return "down"
+
 
     def in_grace_period(self):
         if self.status in ("new", "paused"):
@@ -114,6 +126,15 @@ class Check(models.Model):
         up_ends = self.last_ping + self.timeout
         grace_ends = up_ends + self.grace
         return up_ends < timezone.now() < grace_ends
+
+    def in_nag_period(self):
+        if self.status in ("new", "paused"):
+            return False
+
+        up_ends = self.last_ping + self.timeout
+        grace_ends = up_ends + self.grace
+        return up_ends  < grace_ends < timezone.now()
+
 
     def assign_all_channels(self):
         if self.user:
@@ -131,8 +152,10 @@ class Check(models.Model):
             "ping_url": self.url(),
             "pause_url": settings.SITE_ROOT + pause_rel_url,
             "tags": self.tags,
+            "departments": self.departments,
             "timeout": int(self.timeout.total_seconds()),
             "grace": int(self.grace.total_seconds()),
+            "nag": int(self.nag.total_seconds()),
             "n_pings": self.n_pings,
             "status": self.get_status()
         }
