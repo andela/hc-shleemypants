@@ -44,3 +44,7 @@ class AddWebhookForm(forms.Form):
 
     def get_value(self):
         return "{value_down}\n{value_up}".format(**self.cleaned_data)
+
+class PriorityForm(forms.Form):
+    team = forms.CharField(max_length=500, required=False)
+    selected_priority = forms.IntegerField(min_value=-2, max_value=2) 

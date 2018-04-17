@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOST = "localhost"
 SECRET_KEY = "---"
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', 'hc-shleemypants.herokuapp.com']
+ALLOWED_HOSTS = ['hc-shleemypants.herokuapp.com']
 DEFAULT_FROM_EMAIL = 'hc-shleemypants@protonmail.com'
 USE_PAYMENTS = False
 
@@ -155,6 +155,14 @@ PUSHOVER_EMERGENCY_EXPIRATION = 86400
 # Pushbullet integration -- override these in local_settings
 PUSHBULLET_CLIENT_ID = None
 PUSHBULLET_CLIENT_SECRET = None
+
+# Telegram bot token
+TELEGRAM_TOKEN = '597815530:AAGs71IQ_Jfvm2sT1398UPjD0vOq4IMDI58'
+
+#Twillio integration 
+TWILLIO_ACCOUNT_SID = 'AC22af6257bdf844f31c388950f6c80da1'
+TWILLIO_AUTH_TOKEN = '7ff3bf0793508183dcfe6de4e50b060d'
+TWILLIO_NUMBER = "+17205864728"
 
 if os.path.exists(os.path.join(BASE_DIR, "hc/local_settings.py")):
     from .local_settings import *

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load compress humanize staticfiles hc_extras %}
+
+{% block title %}Add Telegram - healthchecks.io{% endblock %}
+
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+
+    <h1>Telegram</h1>
+
+    <p>If your team uses <a href="https://telegram.org/">Telegram</a>, you can set
+      up healthchecks.io to post status updates directly to you through the hcshleemypants telegram bot</p>
+
+    <h2>Setup Guide</h2>
+
+    <div class="row ai-step">
+        <div class="col-sm-6">
+            <span class="step-no">1</span>
+            Log into your Telegram account and search for the hc-shleemypants bot. After you 
+                have found it start the bot from your chat, then enter your telegram username below and submit. 
+        </div>
+    </div>
+
+    <div class="row ai-step">
+        <div class="col-sm-6">
+            <span class="step-no">2</span>
+            Thats it you are done. The bot will notify you of the status of your checks
+        </div>
+    </div>
+
+    <form method="post" class="form-horizontal" action="{% url 'hc-add-channel' %}">
+      {% csrf_token %}
+      <input type="hidden" name="kind" value="telegram" />
+      <div class="form-group">
+          <label class="col-sm-2 control-label">telegram username</label>
+          <div class="col-sm-10">
+              <input type="text" class="form-control" name="value" placeholder="">
+          </div>
+      </div>
+      <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-primary">Save Integration</button>
+          </div>
+      </div>
+    </form>
+
+</div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% endcompress %}
+{% endblock %}
