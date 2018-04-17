@@ -99,12 +99,6 @@ class Check(models.Model):
         self.send_alert()
         self.status = "up"
 
-    # def nag_team_member(self):
-    #     """Notify when a check has gone down for an extended period"""
-    #     if self.status == "nag":
-    #         self.send_alert()
-    #     return ""
-
     def get_status(self):
         if self.status in ("new", "paused"):
             return self.status

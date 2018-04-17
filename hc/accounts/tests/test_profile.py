@@ -36,10 +36,9 @@ class ProfileTestCase(BaseTestCase):
         self.assertEquals(200,  r.status_code)
 
         self.alice.profile.send_report(7)
-
+        
         self.assertGreater(len(mail.outbox), 0)
         self.assertIn(mail.outbox[0].subject, "Recent Reports")
-
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn( 'This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
         self.assertIn( 'Test Check',mail.outbox[0].body)

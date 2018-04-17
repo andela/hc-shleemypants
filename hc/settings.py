@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOST = "localhost"
 SECRET_KEY = "---"
 DEBUG = True
-ALLOWED_HOSTS = ['hc-shleemypants.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', 'hc-shleemypants.herokuapp.com']
 DEFAULT_FROM_EMAIL = 'hc-shleemypants@protonmail.com'
 USE_PAYMENTS = False
 
@@ -36,11 +36,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'compressor',
     'djmail',
+    'django_markdown',
 
     'hc.accounts',
     'hc.api',
     'hc.front',
-    'hc.payments'
+    'hc.payments',
+    'hc.blog'
 )
 
 MIDDLEWARE = (
