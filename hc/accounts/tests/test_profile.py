@@ -25,13 +25,20 @@ class ProfileTestCase(BaseTestCase):
         self.assertRedirects(r, "/accounts/set_password_link_sent/")
 
     def test_it_sends_report(self):
+        #login user
+        self.client.login(username="alice@example.org", password="password")
+
         check = Check(name="Test Check", user=self.alice)
         check.save()
 
-        self.alice.profile.send_report()
+        form = {"update_reports_allowed":"1" ,"report_freqs": "immediately"}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEquals(200,  r.status_code)
 
+        self.alice.profile.send_report(7)
+        self.assertGreater(len(mail.outbox), 0)
+        self.assertIn(mail.outbox[0].subject, "Recent Reports")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn( 'Monthly Report',mail.outbox[0].subject)
         self.assertIn( 'This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
         self.assertIn( 'Test Check',mail.outbox[0].body)
 

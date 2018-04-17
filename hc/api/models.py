@@ -19,7 +19,8 @@ STATUSES = (
     ("up", "Up"),
     ("down", "Down"),
     ("new", "New"),
-    ("paused", "Paused")
+    ("paused", "Paused"),
+    ("often", "Often")
 )
 DEFAULT_TIMEOUT = td(days=1)
 DEFAULT_GRACE = td(hours=1)
@@ -54,6 +55,7 @@ class Check(models.Model):
     last_ping = models.DateTimeField(null=True, blank=True)
     alert_after = models.DateTimeField(null=True, blank=True, editable=False)
     status = models.CharField(max_length=6, choices=STATUSES, default="new")
+    often = models.BooleanField(default=False)
     priority = models.IntegerField(default=0)
 
     def name_then_code(self):
@@ -72,7 +74,7 @@ class Check(models.Model):
         return "%s@%s" % (self.code, settings.PING_EMAIL_DOMAIN)
 
     def send_alert(self):
-        if self.status not in ("up", "down", "late"):
+        if self.status not in ("up", "down", "late", "often"):
             raise NotImplementedError("Unexpected status: %s" % self.status)
 
         errors = []
@@ -83,6 +85,12 @@ class Check(models.Model):
 
         return errors
 
+    def alert_run_too_often(self):
+        """Notify user when job is run too often."""
+        self.status = "often"
+        self.send_alert()
+        self.status = "up"
+        
     def get_status(self):
         if self.status in ("new", "paused"):
             return self.status
@@ -93,6 +101,9 @@ class Check(models.Model):
             return "up"
         elif self.last_ping + self.timeout + self.grace > now:
             return "late"
+
+        if self.often and now - self.last_ping < self.timeout + self.grace:
+            return "often"
 
         return "down"
 
