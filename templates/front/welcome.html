@@ -8,27 +8,27 @@
     <div class="col-sm-12">
         <h1 id="pitch">Cron Monitoring. Get Notified When Your Cron Jobs Fail.</h1>
     </div>
-    </div>
+</div>
 
-    <div class="row">
+<div class="row">
     <div class="col-sm-6 col-sm-push-6">
         <p id="pitch-text">Make a HTTP GET request to this address from your cron job, daemon, script or long running task.
-        <strong>When this address is not requested for a set time period, you will get alerted.</strong> Below are snippets that are ready to be copy/pasted into your own scripts.</p>
-    </div>
-    <div class="col-sm-6 col-sm-pull-6">
-        <h2 id="pitch-subtitle">Here's an unique ping address for you:</h2>
-        <div id="pitch-url">
-            <input
+            <strong>When this address is not requested for a set time period, you will get alerted.</strong> Below are snippets that are ready to be copy/pasted into your own scripts.</p>
+        </div>
+        <div class="col-sm-6 col-sm-pull-6">
+            <h2 id="pitch-subtitle">Here's an unique ping address for you:</h2>
+            <div id="pitch-url">
+                <input
                 id="pitch-url-input"
                 class="form-control"
                 type="text"
                 value="{{ ping_url }}"
                 readonly />
+            </div>
         </div>
     </div>
-    </div>
-
-
+    
+    
     <div class="row">
         <div class="col-sm-12">
             <ul class="nav nav-tabs" role="tablist">
@@ -96,47 +96,48 @@
 </div>
 
 <div class="get-started-bleed">
-<div class="container">
-    <div class="row">
-        <div id="get-started" class="col-sm-6 col-sm-offset-3">
-            <h2>E-mail Address to Receive Alerts:</h2>
-            <form action="{% url 'hc-login' %}" method="post">
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <div class="input-group input-group-lg">
-                        <div class="input-group-addon">@</div>
-                        <input
+    <div class="container">
+        <div class="row">
+            <div id="get-started" class="col-sm-6 col-sm-offset-3">
+                <h2>E-mail Address to Receive Alerts:</h2>
+                <form action="{% url 'hc-login' %}" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <div class="input-group input-group-lg">
+                            <div class="input-group-addon">@</div>
+                            <input
                             type="email"
                             class="form-control"
                             name="email"
                             autocomplete="email"
                             placeholder="Email">
+                        </div>
                     </div>
-                </div>
-
-                <div class="clearfix">
-                    <button type="submit" class="btn btn-lg btn-primary pull-right">
-                        Get Started
-                    </button>
-                </div>
-            </form>
-
+                    
+                    <div class="clearfix">
+                        <button type="submit" class="btn btn-lg btn-primary pull-right">
+                            Get Started
+                        </button>
+                    </div>
+                </form>
+                
+            </div>
         </div>
     </div>
-</div>
 </div>
 
 <div class="container">
     <div class="row">
-    <div class="col-sm-12">
-        <h2 class="tour-title">A quick peek of what's inside:</h2>
+        <div class="col-sm-12">
+            <h2 class="tour-title">A quick peek of what's inside:</h2>
+        </div>
     </div>
-    </div>
-
+    <p class="about-text">Create scheduled tasks from the user interface along with alerts to get notified when they fail.</p>
+    
     <div class="row tour-section">
-    <div class="col-sm-8">
-        <img
+        <div class="col-sm-8">
+            <img
             class="img-responsive"
             src="{% static 'img/my_checks.png' %}"
             srcset="{% static 'img/my_checks.png'%} 1x, {% static 'img/my_checks@2x.png'%} 2x"
@@ -144,8 +145,9 @@
     </div>
     <div class="col-sm-4">
         <p>
+            Create schedules checks with the <span class="text-success">Add check</span> button. 
             A list of your checks, one for each Cron job, daemon or
-            periodically running task you want to monitor.
+            periodically running task you want to monitor will be displayed on the checks page.
         </p>
         <p>
             Give names to your checks to easily recognize them
@@ -223,7 +225,7 @@
     </div>
     <div class="col-sm-4">
         <p>
-            You can set up additional ways to get notified:
+            You can set up additional ways to get notified on the status of your checks:
         </p>
 
         <table class="table welcome-integrations">
@@ -264,9 +266,23 @@
 
             <tr>
                 <td>
-                    <img width="22" height="22" alt="VictorOps icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAUEBAQEAwUEBAQGBQUGCA0ICAcHCBALDAkNExAUExIQEhIUFx0ZFBYcFhISGiMaHB4fISEhFBkkJyQgJh0gISD/2wBDAQUGBggHCA8ICA8gFRIVICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICD/wgARCAAsACwDAREAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAABAUGAgMH/8QAGQEBAAMBAQAAAAAAAAAAAAAABQMEBgIB/9oADAMBAAIQAxAAAAH2KPqez6w1WfPnr1wtknTm82wtNu1WpCSjJLzrdZrQZXKOtFaLtszhXlmMw32nizx1jjqs1gKglBKKi7bNKswTebZMu1g6Vkq3BVaoLXXgtWeezyzC/VctG668/8QAHRAAAgMAAwEBAAAAAAAAAAAAAgMAAQQSEzEQEf/aAAgBAQABBQIiEBbsYUAWNguaERqpvzY3k2vUK6poX1zyIZ2pK/0soi0QDgBIXZnd2a2EAuHg4C4mohJetgfMyKJOpHZUQ01z20pJxVVCMYhbYwKWaMyyqqoan//EACIRAAICAgICAwEBAAAAAAAAAAECAAMREgQxECETIjJRYf/aAAgBAwEBPwFVLnAlfEVf17jMteI1KN2JfxjX9l68cSvVdv7DLrPkwT3OPZv10PF1fxviKMDE5LNWQyR23O0W5gNFigAepZWGOTKm2QGOuwwJYrK32nFrb9HrxyLyr4E41+h1brxdUr4zOpdcKx/sJycnxXc9fUR9xky/kOpwIST7Pj//xAAlEQACAgEDBAEFAAAAAAAAAAABAgADBBESIRATMTIFIkFRYeH/2gAIAQIBAT8BssWtdzS75Cx+E4ErWy7XnxEyLa/UzFzRb9LcHp8hfvs2DwIODMans6gePtMynt8t5MHHMxbu7WGjnViZgotylLP7Kq+2u3WPjVljZZLGLMSZTcyDQTITt2ssqcI2pEpdXTVDM+5PUcnph4oevc0zsXujcvmEacGY1717gv4hOvJmNjNe36iqFG0dLsWu32EtqFbaLMXDrcbmiqFGg6f/xAAlEAABAwMCBgMAAAAAAAAAAAABAAIREBIhIkEDMTJRYbFicaH/2gAIAQEABj8CucYC0aQnZJgSsPKtdh3ulmzaOAMtOQgXZe4zQO33RKcziQe3dWzMI8R+fvkESVATm+UCRIUsMjyrRl3qlztyrm9Q/aPtOykr47lADkKahnuiGkq50lQBAp//xAAiEAEAAgEEAgIDAAAAAAAAAAABABEhMUFRcRBhgZGxwdH/2gAIAQEAAT8hd1iIp+3EVcfNjv1FsjQf4/BKj/aKgpZxEyBdMrIsk8QVCYSXl6doj2q3K6I+CVRY0XGbvteCoi3tpFioXcX451C5lCBk82qXW7fvTwpRwdRa/wBXCIjSUkAGC7XuKolrvDIFCBh0FHjPdJhlIRpmH+gvEOmDY8f/2gAMAwEAAgADAAAAEHVHLHFBK1W3LGrpZKrP/8QAIxEBAAICAAYCAwAAAAAAAAAAAQARITEQQVFhcaGBsZHh8f/aAAgBAwEBPxA6drCrzeoUKC0IXggmz6cBtb+kFiEOgoYZYQ0AEQSmXB1s8QBHIl5Au+n9l6ilhXD42wmft895RiH22IqUxgCntKpg9nzzrh0hkLnD1BEsjDObPxABRqWd8CO2x4YR46co4iTCMjtlvD//xAAkEQEAAgEDBAIDAQAAAAAAAAABABExIUFREGFx8IGhkcHRsf/aAAgBAgEBPxBA9BGH9t74irsoXLtHLXxk/DFw/wDF6Jdf13/kYClx7S3rFES3V7Gx9/USgZlm5w+T24rOVWUwIY4c1vX7lGUhi+OIzVu14IhOvbHx24iddLjoc6eHEA3D3Ds8QohO+fuXXvt3R4MX36c91rxEr9P2RFRTCUaWfnZiJS1gAChl93gMaDpqetyaPvmM2axNWz2vSBjoOn//xAAlEAEAAgAFBAMAAwAAAAAAAAABABEhMUFRYRBxgaGRsdHB8PH/2gAIAQEAAT8QMQPFfo5itummfu6eJYTAUVrTuwqnDeHhhgEyr0bPHRHjuqNdb4ygHJIqyTaB16WNtjEfUq5P5yGQfPqIWosTRlqyvxP6PmZhbXdYDKZVauzrWv5hYecs4aHiVCgwUAcbRNER+XG0cqHg3o/I4CgT3MT1ApE4jTXCZPMyRlLPBuOXtVe18GV849D7hR+I+xhsyNfQ7x25FIlJKwrKsQBgkeAq1Nqx6DOENjmAEAA0DoE197/p5lpEtqLT4gVuOenoX7mACACg6f/Z" />
+                    <img width="22" height="22" alt="VictorOps icon" src="data:image/jpeg;base64,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"/>
                 </td>
                 <td>Open and resolve incidents in <a href="https://victorops.com/">VictorOps</a>.</td>
+            </tr>
+
+            <tr>
+                <td>
+                    <img width="22" height="22" alt="SMS icon" src="{% static 'img/integrations/sms.png' %}" />
+                </td>
+                <td>Notifications via SMS <a href="https://www.twilio.com/">Twilio</a></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <img width="22" height="22" alt="Telegram icon" src="{% static 'img/integrations/telegram.png' %}" />
+                </td>
+                <td>Notifications via <a href="https://telegram.org/">Telegram</a> bot.</td>
             </tr>
 
             {% if enable_pushover %}
