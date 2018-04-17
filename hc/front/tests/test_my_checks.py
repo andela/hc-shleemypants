@@ -62,13 +62,14 @@ class MyChecksTestCase(BaseTestCase):
         self.assertContains(r, "label-warning")
 
     def test_it_counts_renders_unresolved_checks(self):
-        self.check.last_ping = timezone.now() - td(weeks=3)
-        self.check.status = "down"
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
+        self.check.status = "up"
         self.check.save()
 
         self.client.login(username="alice@example.org", password="password")
         r = self.client.get("/checks/")
-        self.assertEqual(len(r.context[0]["unresolved"]),1)
+
+        self.assertEqual(len(r.context[0]["unresolved"]), 1)
 
     def test_it_counts_running_checks(self):
         self.check.last_ping = timezone.now()
@@ -98,13 +99,14 @@ class MyChecksTestCase(BaseTestCase):
         samjunior.set_password("password")
         samjunior.save()
 
-        self.check.last_ping = timezone.now() - td(days=12)
+        self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
         self.check.user = samjunior
-        self.check.status = "down"
+        self.check.status = "up"
         self.check.save()
 
         self.client.login(username="samjunior@fishnet.com", password="password")
         r = self.client.get("/checks/")
+
         self.assertContains(r, 'You don\'t have any running checks.')
 
     def test_it_shows_no_checks_unresolved_when_empty(self):
