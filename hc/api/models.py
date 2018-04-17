@@ -13,6 +13,8 @@ from django.utils import timezone
 from hc.api import transports
 from hc.lib import emails
 
+import telepot
+
 STATUSES = (
     ("up", "Up"),
     ("down", "Down"),
@@ -24,7 +26,7 @@ DEFAULT_GRACE = td(hours=1)
 CHANNEL_KINDS = (("email", "Email"), ("webhook", "Webhook"),
                  ("hipchat", "HipChat"),
                  ("slack", "Slack"), ("pd", "PagerDuty"), ("po", "Pushover"),
-                 ("victorops", "VictorOps"))
+                 ("victorops", "VictorOps"), ("telegram", "Telegram"), ("sms", "Sms"))
 
 PO_PRIORITIES = {
     -2: "lowest",
@@ -69,7 +71,7 @@ class Check(models.Model):
         return "%s@%s" % (self.code, settings.PING_EMAIL_DOMAIN)
 
     def send_alert(self):
-        if self.status not in ("up", "down"):
+        if self.status not in ("up", "down", "late"):
             raise NotImplementedError("Unexpected status: %s" % self.status)
 
         errors = []
@@ -86,8 +88,10 @@ class Check(models.Model):
 
         now = timezone.now()
 
-        if self.last_ping + self.timeout + self.grace > now:
+        if self.last_ping + self.timeout > now:
             return "up"
+        elif self.last_ping + self.timeout + self.grace > now:
+            return "late"
 
         return "down"
 
@@ -183,6 +187,10 @@ class Channel(models.Model):
             return transports.Pushbullet(self)
         elif self.kind == "po":
             return transports.Pushover(self)
+        elif self.kind == "telegram":
+            return transports.Telegram(self)
+        elif self.kind == "sms":
+            return transports.Sms(self)
         else:
             raise NotImplementedError("Unknown channel kind: %s" % self.kind)
 
