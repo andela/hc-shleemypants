@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{% static 'css/nouislider.min.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/nouislider.pips.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/docs.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/welcome.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/my_checks.css' %}" type="text/css">
@@ -29,6 +30,7 @@
     <link rel="stylesheet" href="{% static 'css/log.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/add_pushover.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/settings.css' %}" type="text/css">
+    
     {% endcompress %}
 </head>
 <body class="page-{{ page }}">
@@ -96,6 +98,9 @@
 
                 <li {% if page == 'about' %} class="active" {% endif %}>
                     <a href="{% url 'hc-about' %}">About</a>
+                </li>
+                <li {% if page == 'blog-page' %} class="active" {% endif %}>
+                    <a href="{% url 'blog:hc-category' %}">Blogs</a>
                 </li>
             </ul>
 

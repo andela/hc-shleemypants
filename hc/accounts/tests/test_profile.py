@@ -17,17 +17,30 @@ class ProfileTestCase(BaseTestCase):
         # profile.token should be set now
         self.alice.profile.refresh_from_db()
         token = self.alice.profile.token
-        ### Assert that the token is set
+        self.assertFalse(token is None)
 
-        ### Assert that the email was sent and check email content
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
+        self.assertIn( 'Here\'s a link to set a password', mail.outbox[0].body)
+        self.assertRedirects(r, "/accounts/set_password_link_sent/")
 
     def test_it_sends_report(self):
+        #login user
+        self.client.login(username="alice@example.org", password="password")
+
         check = Check(name="Test Check", user=self.alice)
         check.save()
 
-        self.alice.profile.send_report()
+        form = {"update_reports_allowed":"1" ,"report_freqs": "immediately"}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEquals(200,  r.status_code)
 
-        ###Assert that the email was sent and check email content
+        self.alice.profile.send_report(7)
+        self.assertGreater(len(mail.outbox), 0)
+        self.assertIn(mail.outbox[0].subject, "Recent Reports")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn( 'This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
+        self.assertIn( 'Test Check',mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
         self.client.login(username="alice@example.org", password="password")
@@ -42,6 +55,9 @@ class ProfileTestCase(BaseTestCase):
         for member in self.alice.profile.member_set.all():
             member_emails.add(member.user.email)
         self.assertTrue("frank@example.org" in member_emails)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn( 'alice@example.org invites you to',mail.outbox[0].body)
+
 
     def test_add_team_member_checks_team_access_allowed_flag(self):
         self.client.login(username="charlie@example.org", password="password")
@@ -103,4 +119,13 @@ class ProfileTestCase(BaseTestCase):
         # Expect only Alice's tags
         self.assertNotContains(r, "bobs-tag.svg")
 
-    ### Test it creates and revokes API key
+    def test_it_creates_api_key(self):
+        self.client.login(username="alice@example.org", password="password")
+        #include create_api_key in request
+        form = {"create_api_key": "1"}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.profile.refresh_from_db()
+        api_key = self.profile.api_key
+        self.assertFalse(api_key is None)
+
