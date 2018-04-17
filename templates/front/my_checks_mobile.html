@@ -1,5 +1,4 @@
 {% load hc_extras humanize %}
-
 <div class="tab-content visible-xs" >
     <div class="tab-pane active" id="ok_mobile">
 {% if up %}
@@ -137,7 +136,6 @@
                     {% elif check.get_status == "often" %}
                         <span class="fa fa-history"></span>
                     {% endif %}
-                    
                 </td>
             </tr>
             {% if check.tags %}
@@ -200,3 +198,4 @@
 {% endif %}
     </div>
 </div>
+

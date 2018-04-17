@@ -11,10 +11,10 @@ class SwitchTeamTestCase(BaseTestCase):
         c.save()
 
         self.client.login(username="bob@example.org", password="password")
-
+        
         url = "/accounts/switch_team/%s/" % self.alice.username
         r = self.client.get(url, follow=True)
-
+        
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "This belongs to Alice")
         self.assertRedirects(r, "/checks/")

@@ -64,7 +64,6 @@ class MyChecksTestCase(BaseTestCase):
         # Mobile
         self.assertContains(r, "label-warning")
 
-
     def test_it_counts_renders_unresolved_checks(self):
         self.check.last_ping = timezone.now() - (td(days=1) + td(hours=1))
         self.check.status = "up"
@@ -126,7 +125,6 @@ class MyChecksTestCase(BaseTestCase):
         self.client.login(username="samjunior@fishnet.com", password="password")
         r = self.client.get("/checks/")
         self.assertContains(r, 'You don\'t have any unresolved checks')
-
     def test_default_priority_is_normal(self):
         self.client.login(username="alice@example.org", password="password")
         self.assertEqual(self.check.priority, 0)
