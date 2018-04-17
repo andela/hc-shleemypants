@@ -16,9 +16,9 @@ from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm,
-                            TimeoutForm)
+                            TimeoutForm, PriorityForm)
 
-
+import telepot
 # from itertools recipes:
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -123,8 +123,6 @@ def about(request):
 
 @login_required
 def add_check(request):
-    assert request.method == "POST"
-
     check = Check(user=request.team.user)
     check.save()
 
@@ -166,6 +164,18 @@ def update_timeout(request, code):
         check.grace = td(seconds=form.cleaned_data["grace"])
         check.save()
 
+    return redirect("hc-checks")
+
+@login_required
+@uuid_or_400
+def check_priority(request, code):
+    assert request.method == "POST"
+ 
+    check = get_object_or_404(Check, code=code)
+    form = PriorityForm(request.POST)
+    if form.is_valid():
+        check.priority = form.cleaned_data["selected_priority"]
+        check.save()
     return redirect("hc-checks")
 
 
@@ -292,7 +302,18 @@ def channels(request):
 
 
 def do_add_channel(request, data):
-    form = AddChannelForm(data)
+    my_data = {}
+    if data.get('kind') == 'telegram':
+        telepot_bot = telepot.Bot(settings.TELEGRAM_TOKEN)
+        updates = telepot_bot.getUpdates(allowed_updates=['message'])
+        for update in updates:
+            if data['value'] == str(update.get('message').get('chat').get('username')):
+                my_data['value'] = str(update.get('message').get('chat').get('id'))
+                my_data['kind'] = 'telegram'
+    if my_data:
+        form = AddChannelForm(my_data)
+    else:
+        form = AddChannelForm(data)
     if form.is_valid():
         channel = form.save(commit=False)
         channel.user = request.team.user
@@ -310,9 +331,7 @@ def do_add_channel(request, data):
 
 @login_required
 def add_channel(request):
-    assert request.method == "POST"
     return do_add_channel(request, request.POST)
-
 
 @login_required
 @uuid_or_400
@@ -331,7 +350,6 @@ def channel_checks(request, code):
     }
 
     return render(request, "front/channel_checks.html", ctx)
-
 
 @uuid_or_400
 def verify_email(request, code, token):
@@ -382,7 +400,6 @@ def add_webhook(request):
     ctx = {"page": "channels", "form": form}
     return render(request, "integrations/add_webhook.html", ctx)
 
-
 @login_required
 def add_pd(request):
     ctx = {"page": "channels"}
@@ -399,6 +416,22 @@ def add_slack(request):
     }
     return render(request, "integrations/add_slack.html", ctx)
 
+def add_telegram(request):
+    if not request.user.is_authenticated:
+        return redirect('hc-login')
+    ctx = {
+        'page':"channels"
+    }
+    return render(request, "integrations/add_telegram.html", ctx)
+
+def add_sms(request):
+    if not request.user.is_authenticated:
+        return redirect('hc-login')
+    ctx = {
+        'page':'channels',
+    }
+
+    return render(request, "integrations/add_sms.html", ctx)
 
 @login_required
 def add_slack_btn(request):

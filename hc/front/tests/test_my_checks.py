@@ -2,6 +2,7 @@ from hc.api.models import Check
 from hc.test import BaseTestCase
 from datetime import timedelta as td
 from django.utils import timezone
+from hc.front.forms import PriorityForm
 
 
 class MyChecksTestCase(BaseTestCase):
@@ -58,3 +59,17 @@ class MyChecksTestCase(BaseTestCase):
 
         # Mobile
         self.assertContains(r, "label-warning")
+
+    def test_default_priority_is_normal(self):
+        self.client.login(username="alice@example.org", password="password")
+        self.assertEqual(self.check.priority, 0)
+        self.assertEqual(self.check.priority_name, 'normal')
+
+    def test_it_sets_priority(self):
+        self.client.login(username="alice@example.org", password="password")
+        self.check.priority  = 1
+        self.check.save()
+        self.client.post("/checks/{}/priority/".format(self.check.code),{'selected_priority':2})
+        self.check.refresh_from_db()
+        self.assertEqual(self.check.priority, 2)
+

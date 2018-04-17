@@ -13,6 +13,8 @@ from django.utils import timezone
 from hc.api import transports
 from hc.lib import emails
 
+import telepot
+
 STATUSES = (
     ("up", "Up"),
     ("down", "Down"),
@@ -25,7 +27,7 @@ DEFAULT_GRACE = td(hours=1)
 CHANNEL_KINDS = (("email", "Email"), ("webhook", "Webhook"),
                  ("hipchat", "HipChat"),
                  ("slack", "Slack"), ("pd", "PagerDuty"), ("po", "Pushover"),
-                 ("victorops", "VictorOps"))
+                 ("victorops", "VictorOps"), ("telegram", "Telegram"), ("sms", "Sms"))
 
 PO_PRIORITIES = {
     -2: "lowest",
@@ -54,6 +56,7 @@ class Check(models.Model):
     alert_after = models.DateTimeField(null=True, blank=True, editable=False)
     status = models.CharField(max_length=6, choices=STATUSES, default="new")
     often = models.BooleanField(default=False)
+    priority = models.IntegerField(default=0)
 
     def name_then_code(self):
         if self.name:
@@ -71,7 +74,7 @@ class Check(models.Model):
         return "%s@%s" % (self.code, settings.PING_EMAIL_DOMAIN)
 
     def send_alert(self):
-        if self.status not in ("up", "down", "often"):
+        if self.status not in ("up", "down", "late", "often"):
             raise NotImplementedError("Unexpected status: %s" % self.status)
 
         errors = []
@@ -94,8 +97,10 @@ class Check(models.Model):
 
         now = timezone.now()
 
-        if self.last_ping + self.timeout + self.grace > now:
+        if self.last_ping + self.timeout > now:
             return "up"
+        elif self.last_ping + self.timeout + self.grace > now:
+            return "late"
 
         if self.often and now - self.last_ping < self.timeout + self.grace:
             return "often"
@@ -140,6 +145,10 @@ class Check(models.Model):
             result["next_ping"] = None
 
         return result
+
+    @property
+    def priority_name(self):
+        return PO_PRIORITIES[self.priority]
 
 
 class Ping(models.Model):
@@ -194,6 +203,10 @@ class Channel(models.Model):
             return transports.Pushbullet(self)
         elif self.kind == "po":
             return transports.Pushover(self)
+        elif self.kind == "telegram":
+            return transports.Telegram(self)
+        elif self.kind == "sms":
+            return transports.Sms(self)
         else:
             raise NotImplementedError("Unknown channel kind: %s" % self.kind)
 

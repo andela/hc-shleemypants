@@ -34,14 +34,51 @@ class ListChecksTestCase(BaseTestCase):
     def test_it_works(self):
         r = self.get()
         ### Assert the response status code
+        self.assertEqual(r.status_code, 200)
 
         doc = r.json()
         self.assertTrue("checks" in doc)
 
         checks = {check["name"]: check for check in doc["checks"]}
         ### Assert the expected length of checks
+        self.assertEqual(len(checks), 2)
         ### Assert the checks Alice 1 and Alice 2's timeout, grace, ping_url, status,
         ### last_ping, n_pings and pause_url
+        
+        c1= dict(
+            timeout=checks["Alice 1"]["timeout"],
+            grace=checks["Alice 1"]["grace"],
+            ping_url=checks["Alice 1"]["ping_url"],
+            status=checks["Alice 1"]["status"],
+            last_ping=checks["Alice 1"]["last_ping"],
+            n_pings=checks["Alice 1"]["n_pings"]
+        )
+
+        c2= dict(
+            timeout=checks["Alice 2"]["timeout"],
+            grace=checks["Alice 2"]["grace"],
+            ping_url=checks["Alice 2"]["ping_url"],
+            status=checks["Alice 2"]["status"],
+            last_ping=checks["Alice 2"]["last_ping"]
+        )
+        r1 = dict(
+            timeout=3600,
+            grace=900,
+            status="new",
+            last_ping=self.a1.last_ping.isoformat(),
+            n_pings=1,
+            ping_url=str(self.a1.url())
+        )
+
+        r2 = dict(
+            timeout= 86400,
+            grace=3600,
+            status="up",
+            last_ping=self.a2.last_ping.isoformat(),
+            ping_url=str(self.a2.url())
+        )
+        self.assertEqual(c1, r1)
+        self.assertEqual(c2, r2)
 
     def test_it_shows_only_users_checks(self):
         bobs_check = Check(user=self.bob, name="Bob 1")
@@ -54,3 +91,16 @@ class ListChecksTestCase(BaseTestCase):
             self.assertNotEqual(check["name"], "Bob 1")
 
     ### Test that it accepts an api_key in the request
+    def test_it_accepts_api_key_in_request(self):
+        r = self.client.get(
+            "/api/v1/checks/", 
+             HTTP_X_API_KEY="abc"
+            )
+        self.assertEqual(r.status_code, 200)
+        
+        r = self.client.get(
+            "/api/v1/checks/"
+            )
+        self.assertEqual(r.status_code, 400)
+
+    

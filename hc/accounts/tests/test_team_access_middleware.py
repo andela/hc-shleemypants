@@ -14,4 +14,4 @@ class TeamAccessMiddlewareTestCase(TestCase):
         r = self.client.get("/about/")
         self.assertEqual(r.status_code, 200)
 
-        ### Assert the new Profile objects count
+        self.assertEqual(Profile.objects.count(), 1)
