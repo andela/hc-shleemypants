@@ -41,7 +41,6 @@ PO_PRIORITIES = {
 
 
 class Check(models.Model):
-
     class Meta:
         # sendalerts command will query using these
         index_together = ["status", "user", "alert_after"]
@@ -63,6 +62,9 @@ class Check(models.Model):
     often = models.BooleanField(default=False)
     priority = models.IntegerField(default=0)
 
+
+    member_access_allowed = models.BooleanField(default=False)
+    owner_id = models.IntegerField(default=0)
 
     def name_then_code(self):
         if self.name:
@@ -157,7 +159,8 @@ class Check(models.Model):
             "grace": int(self.grace.total_seconds()),
             "nag": int(self.nag.total_seconds()),
             "n_pings": self.n_pings,
-            "status": self.get_status()
+            "status": self.get_status(),
+            "member_access_allowed": self.member_access_allowed
         }
 
         if self.last_ping:

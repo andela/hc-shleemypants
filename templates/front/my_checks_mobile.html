@@ -1,9 +1,8 @@
 {% load hc_extras humanize %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.min.css">
-<div class="tab-content">
+<div class="tab-content visible-xs" >
     <div class="tab-pane active" id="ok_mobile">
 {% if up %}
-<ul id="checks-list" class="visible-xs">
+<ul id="checks-list" >
     {% for check in up %}
     <li>
         <h2>
@@ -137,7 +136,6 @@
                     {% elif check.get_status == "often" %}
                         <span class="fa fa-history"></span>
                     {% endif %}
-                    
                 </td>
             </tr>
             {% if check.tags %}
@@ -200,3 +198,4 @@
 {% endif %}
     </div>
 </div>
+

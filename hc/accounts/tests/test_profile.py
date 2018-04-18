@@ -21,7 +21,7 @@ class ProfileTestCase(BaseTestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
-        self.assertIn( 'Here\'s a link to set a password', mail.outbox[0].body)
+        self.assertIn('Here\'s a link to set a password', mail.outbox[0].body)
         self.assertRedirects(r, "/accounts/set_password_link_sent/")
 
     def test_it_sends_report(self):
@@ -45,27 +45,26 @@ class ProfileTestCase(BaseTestCase):
 
     def test_it_adds_team_member(self):
         self.client.login(username="alice@example.org", password="password")
+        check = Check(name="Geeky Task", user=self.alice)
+        check.save()
 
-        form = {"invite_team_member": "1", "email": "frank@example.org"}
+        form = {"invite_team_member": "1", "email": "frank@example.org", "check": "Geeky Task"}
         r = self.client.post("/accounts/profile/", form)
-        assert r.status_code == 200
+        self.assertTrue(r.status_code, 200)
 
         member_emails = set()
         for member in self.alice.profile.member_set.all():
             member_emails.add(member.user.email)
-
         self.assertTrue("frank@example.org" in member_emails)
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn( 'alice@example.org invites you to',mail.outbox[0].body)
 
-
     def test_add_team_member_checks_team_access_allowed_flag(self):
         self.client.login(username="charlie@example.org", password="password")
-
         form = {"invite_team_member": "1", "email": "frank@example.org"}
         r = self.client.post("/accounts/profile/", form)
-        assert r.status_code == 403
+        self.assertTrue(r.status_code,403)
 
     def test_it_removes_team_member(self):
         self.client.login(username="alice@example.org", password="password")

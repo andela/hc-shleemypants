@@ -30,9 +30,17 @@ def pairwise(iterable):
 
 @login_required
 def my_checks(request):
-    q = Check.objects.filter(user=request.team.user).order_by("created")
-    checks = list(q)
+    current_user = request.user.id
     departments = set()
+    if request.team == request.user.profile:
+        checks = list(Check.objects.filter(user=request.team.user).order_by("created"))
+    else:
+        checks = list(Check.objects.filter(
+            user=request.team.user,
+            member_access_allowed=True,
+            owner_id=current_user
+        ).order_by('created'))
+
     counter = Counter()
     down_tags, grace_tags = set(), set()
     for check in checks:
@@ -56,6 +64,7 @@ def my_checks(request):
 
     unresolved = [new_check for new_check in checks if new_check.get_status() == "down"]
     up = [check for check in checks if check.get_status() == "up" or check.get_status() == "new" or check.get_status() == "late"]
+
 
 
     ctx = {
