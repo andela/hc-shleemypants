@@ -15,6 +15,18 @@
         {% endif %}
         </h1>
     </div>
+    <div class=" col-sm-12 cs-dptmnt">
+      <p>Departments</p>
+    </div>
+
+    {% if departments %}
+    <div id="my-checks-departments" class="col-sm-12">
+        {% for department in departments %}
+            <button class="btn btn-default btn-xs cs-dep" data-toggle="button">{{ department }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {% if tags %}
     <div id="my-checks-tags" class="col-sm-12">
         {% for tag, count in tags %}
@@ -69,7 +81,7 @@
 </div>
 
 <div id="update-name-modal" class="modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog ">
         <form id="update-name-form" class="form-horizontal" method="post">
             {% csrf_token %}
             <div class="modal-content">
@@ -114,6 +126,25 @@
                                 <span class="help-block">
                                     Optionally, assign tags for easy filtering.
                                     Separate multiple tags with spaces.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="update-departments-input" class="col-sm-2 control-label">
+                                Departments
+                            </label>
+                            <div class="col-sm-9">
+                                <input
+                                    id="update-departments-input"
+                                    name="departments"
+                                    type="text"
+                                    value=""
+                                    placeholder="IT marketing"
+                                    class="form-control" />
+
+                                <span class="help-block">
+                                    Assign your check a department.
                                 </span>
                             </div>
                         </div>
@@ -309,6 +340,65 @@
             </div>
         </div>
     </div>
+</div>
+
+<div id="priority-modal" class="modal">
+    <div class="modal-dialog modal-sm">
+        <form id="update-priority-form" method="post" >
+            {% csrf_token %}
+            <input type="hidden" name="priority" id="update-priority-options" />
+            <div class="modal-content">
+                <div class="modal-body">
+                   <div class="modal-header" style="margin-bottom:10px">
+                        <div class="update-priority-info text-center">
+                            <span class="update-priority-label" data-toggle="tooltip" title="Expected Priorities.">
+                                    <h4 style="float :non">Priority</h4>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display:none">
+                        <div id="priority-slider"  style="margin-bottom:10px" >
+                        </div>  
+                    </div>
+                        <div class="row" style="margin-top:10px">
+                            <div class="col-sm-12 col-md-12">
+                                <div>
+                                    <select class="form-control form-control-lg" id ="input-select" name="selected_priority">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    {% comment %} <hr />
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label for="add-team-members"
+                                       class="col-sm-2 control-label">
+                                    Team Members
+                                </label>
+                                <div class="col-sm-10">
+                                    <input id="add-team-members" name="team"
+                                           type="text" class="form-control"
+                                           placeholder="Team Emails" />
+                                    <span class="help-block">
+                                       Enter email addresses of team members
+                                        to be contacted in case failing high
+                                        priority checks are not attended to in
+                                        24 hours. The emails should be space
+                                        separated.
+                                 </span>
+                                </div>
+                            </div>
+                        </div> {% endcomment %}
+                </div>
+                <div class="modal-footer" style="margin-top:10px">
+                    <div>
+                        <button type="button" class="btn btn-default destroySlider" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary destroySlider">Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+</div>
 </div>
 
 <form id="pause-form" method="post">

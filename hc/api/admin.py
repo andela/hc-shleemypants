@@ -172,6 +172,10 @@ class ChannelsAdmin(admin.ModelAdmin):
             return "Email"
         elif obj.kind == "email" and not obj.email_verified:
             return "Email <i>(unverified)</i>"
+        elif obj.kind == "telegram":
+            return "telegram"
+        elif obj.kind == "sms":
+            return "sms"
         else:
             raise NotImplementedError("Bad channel kind: %s" % obj.kind)
 

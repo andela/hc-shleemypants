@@ -25,6 +25,7 @@ class Command(BaseCommand):
         often = query.filter(alert_after__lt=now, status="often")
         nag_down = query.filter(nag_after__lt=now, status="down")
         nag_up = query.filter(nag_after__gt=now, status="nag")
+
         # Don't combine this in one query so Postgres can query using index:
         checks = list(going_down.iterator()) + list(going_up.iterator()) + list(nag_down.iterator()) + list(nag_up.iterator())
         if not checks:

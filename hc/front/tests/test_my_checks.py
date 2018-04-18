@@ -4,6 +4,7 @@ from hc.api.models import Check
 from hc.test import BaseTestCase
 from datetime import timedelta as td
 from django.utils import timezone
+from hc.front.forms import PriorityForm
 
 
 class MyChecksTestCase(BaseTestCase):
@@ -11,13 +12,15 @@ class MyChecksTestCase(BaseTestCase):
     def setUp(self):
         super(MyChecksTestCase, self).setUp()
         self.check = Check(user=self.alice, name="Alice Was Here")
+        self.check.owner_id = self.alice.id
+        self.check.member_access_allowed=True
         self.check.save()
 
     def test_it_works(self):
-        for email in ("alice@example.org", "bob@example.org"):
+        for email in ["alice@example.org"]:
             self.client.login(username=email, password="password")
             r = self.client.get("/checks/")
-            self.assertContains(r, "Alice Was Here", status_code=200)
+            self.assertContains(r,"Alice Was Here", status_code=200)
 
     def test_it_shows_green_check(self):
         self.check.last_ping = timezone.now()
@@ -48,7 +51,7 @@ class MyChecksTestCase(BaseTestCase):
         self.assertContains(r, "label-danger")
 
     def test_it_shows_amber_check(self):
-        self.check.last_ping = timezone.now() - td(days=1, minutes=30)
+        self.check.last_ping = timezone.now() - (td(days=1) + td(minutes=35))
         self.check.status = "up"
         self.check.save()
 
@@ -122,3 +125,15 @@ class MyChecksTestCase(BaseTestCase):
         self.client.login(username="samjunior@fishnet.com", password="password")
         r = self.client.get("/checks/")
         self.assertContains(r, 'You don\'t have any unresolved checks')
+    def test_default_priority_is_normal(self):
+        self.client.login(username="alice@example.org", password="password")
+        self.assertEqual(self.check.priority, 0)
+        self.assertEqual(self.check.priority_name, 'normal')
+
+    def test_it_sets_priority(self):
+        self.client.login(username="alice@example.org", password="password")
+        self.check.priority  = 1
+        self.check.save()
+        self.client.post("/checks/{}/priority/".format(self.check.code),{'selected_priority':2})
+        self.check.refresh_from_db()
+        self.assertEqual(self.check.priority, 2)

@@ -36,11 +36,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'compressor',
     'djmail',
+    'django_markdown',
 
     'hc.accounts',
     'hc.api',
     'hc.front',
-    'hc.payments'
+    'hc.payments',
+    'hc.blog'
 )
 
 MIDDLEWARE = (
@@ -94,7 +96,7 @@ if os.environ.get("DB") == "postgres":
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.postgresql',
-            'NAME':     'hc',
+            'NAME':     'postgres',
             'USER':     'postgres',
             'TEST': {'CHARSET': 'UTF8'}
         }
@@ -142,6 +144,12 @@ EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_TLS = os.environ['EMAIL_USE_TLS']
 
+DJMAIL_REAL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_USE_TLS = os.environ['EMAIL_USE_TLS']
 # Slack integration -- override these in local_settings
 SLACK_CLIENT_ID = None
 SLACK_CLIENT_SECRET = None
@@ -155,6 +163,14 @@ PUSHOVER_EMERGENCY_EXPIRATION = 86400
 # Pushbullet integration -- override these in local_settings
 PUSHBULLET_CLIENT_ID = None
 PUSHBULLET_CLIENT_SECRET = None
+
+# Telegram bot token
+TELEGRAM_TOKEN = '597815530:AAGs71IQ_Jfvm2sT1398UPjD0vOq4IMDI58'
+
+#Twillio integration 
+TWILLIO_ACCOUNT_SID = 'AC22af6257bdf844f31c388950f6c80da1'
+TWILLIO_AUTH_TOKEN = '7ff3bf0793508183dcfe6de4e50b060d'
+TWILLIO_NUMBER = "+17205864728"
 
 if os.path.exists(os.path.join(BASE_DIR, "hc/local_settings.py")):
     from .local_settings import *

@@ -8,6 +8,22 @@ $(function () {
     var YEAR = {name: "year", nsecs: MONTH.nsecs * 12};
     var UNITS = [YEAR, MONTH, WEEK, DAY, HOUR, MINUTE];
 
+    var select = document.getElementById('input-select');
+    var priorities = {}
+    priorities[-2] = "Lowest";
+    priorities[-1] =  "Low";
+    priorities[0]  = "Normal";
+    priorities[1]  = "High";
+    priorities[2]  = "Emergency";
+
+    for ([k,v] of Object.entries(priorities)) {
+        var option   = document.createElement("option");
+        option.text  = v;
+        option.value = k;
+
+        select.appendChild(option);
+    }
+
     var secsToText = function(total) {
         var remainingSeconds = Math.floor(total);
         var result = "";
@@ -128,6 +144,7 @@ $(function () {
         $("#update-name-form").attr("action", $this.data("url"));
         $("#update-name-input").val($this.data("name"));
         $("#update-tags-input").val($this.data("tags"));
+        $("#update-departments-input").val($this.data("departments"));
         $('#update-name-modal').modal("show");
         $("#update-name-input").focus();
 
@@ -141,7 +158,6 @@ $(function () {
         periodSlider.noUiSlider.set($this.data("timeout"))
         graceSlider.noUiSlider.set($this.data("grace"))
         nagSlider.noUiSlider.set($this.data("nag"))
-
         $('#update-timeout-modal').modal({"show":true, "backdrop":"static"});
 
         return false;
@@ -195,6 +211,43 @@ $(function () {
 
     });
 
+    $("#my-checks-departments button").click(function() {
+        // .active has not been updated yet by bootstrap code,
+        // so cannot use it
+        $(this).toggleClass('checked');
+
+        // Make a list of currently checked departments:
+        var checked = [];
+        $("#my-checks-departments button.checked").each(function(index, el) {
+            checked.push(el.textContent);
+        });
+
+        // No checked tags: show all
+        if (checked.length == 0) {
+            $("#checks-table tr.checks-row").show();
+            $("#checks-list > li").show();
+            return;
+        }
+
+        function applyFilters(index, element) {
+            var departments = $(".my-checks-name", element).data("departments").split(" ");
+            for (var i=0, department; department=checked[i]; i++) {
+                if (departments.indexOf(department) == -1) {
+                    $(element).hide();
+                    return;
+                }
+            }
+
+            $(element).show();
+        }
+
+        // Desktop: for each row, see if it needs to be shown or hidden
+        $("#checks-table tr.checks-row").each(applyFilters);
+        // Mobile: for each list item, see if it needs to be shown or hidden
+        $("#checks-list > li").each(applyFilters);
+
+    });
+
     $(".pause-check").click(function(e) {
         var url = e.target.getAttribute("data-url");
         $("#pause-form").attr("action", url).submit();
@@ -230,6 +283,58 @@ $(function () {
     clipboard.on('error', function(e) {
         var text = e.trigger.getAttribute("data-clipboard-text");
         prompt("Press Ctrl+C to select:", text)
+    });
+
+    $(".priority-cell").click(function() {
+        var $this = $(this);
+        var buttonPriority = $this.find("button").data("url")
+        $("#update-priority-form").attr("action", buttonPriority)
+        var priorityNbr = $this.find("button").data("priority")
+        $("#priority-slider").attr("data-sliderstart", priorityNbr)
+        $("#input-select").val(priorityNbr)
+        // Slider
+        //Creating a Slider to  display the different priorities
+    var priorityslider = document.getElementById('priority-slider');
+    var startSlider = $("#priority-slider");
+
+    noUiSlider.create(priorityslider, {
+        start: [startSlider.attr("data-sliderstart")],
+        connect: "lower",
+        range: {
+            min: -2,
+            max: 2
+        },
+        pips:{
+            mode: "values",
+            values: [-2,-1,0,1,2],
+            density: 100
+
+        }
+    }, true);
+
+    priorityslider.noUiSlider.on('update', function( values, handle ) {
+        var value = values[handle];
+
+        if ( handle ) {
+            inputPriority.value = value;
+        } else {
+            select.value = Math.round(value);
+        }
+    });
+
+    select.addEventListener('change', function(){
+        priorityslider.noUiSlider.set([this.value, null]);
+    });
+        // Slider
+        $("#priority-modal").modal({ show: true, backdrop: "static" });
+        $("#show-advanced-time").modal("hide");
+
+        return false;
+    });
+
+    $(".destroySlider").click(function(){
+        var priorityslider = document.getElementById('priority-slider');
+        priorityslider.noUiSlider.destroy()
     });
 
 

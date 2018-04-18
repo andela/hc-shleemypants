@@ -13,6 +13,8 @@ from django.utils import timezone
 from hc.api import transports
 from hc.lib import emails
 
+import telepot
+
 STATUSES = (
     ("up", "Up"),
     ("down", "Down"),
@@ -27,7 +29,7 @@ DEFAULT_NAG= td(minutes=1)
 CHANNEL_KINDS = (("email", "Email"), ("webhook", "Webhook"),
                  ("hipchat", "HipChat"),
                  ("slack", "Slack"), ("pd", "PagerDuty"), ("po", "Pushover"),
-                 ("victorops", "VictorOps"))
+                 ("victorops", "VictorOps"), ("telegram", "Telegram"), ("sms", "Sms"))
 
 PO_PRIORITIES = {
     -2: "lowest",
@@ -39,13 +41,13 @@ PO_PRIORITIES = {
 
 
 class Check(models.Model):
-
     class Meta:
         # sendalerts command will query using these
         index_together = ["status", "user", "alert_after"]
 
     name = models.CharField(max_length=100, blank=True)
     tags = models.CharField(max_length=500, blank=True)
+    departments = models.CharField(max_length=500, blank=True)
     code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     user = models.ForeignKey(User, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -58,6 +60,11 @@ class Check(models.Model):
     nag_after = models.DateTimeField(null=True,blank=True,editable=False)
     status = models.CharField(max_length=6, choices=STATUSES, default="new")
     often = models.BooleanField(default=False)
+    priority = models.IntegerField(default=0)
+
+
+    member_access_allowed = models.BooleanField(default=False)
+    owner_id = models.IntegerField(default=0)
 
     def name_then_code(self):
         if self.name:
@@ -91,12 +98,6 @@ class Check(models.Model):
         self.status = "often"
         self.send_alert()
         self.status = "up"
-
-    # def nag_team_member(self):
-    #     """Notify when a check has gone down for an extended period"""
-    #     if self.status == "nag":
-    #         self.send_alert()
-    #     return ""
 
     def get_status(self):
         if self.status in ("new", "paused"):
@@ -151,11 +152,13 @@ class Check(models.Model):
             "ping_url": self.url(),
             "pause_url": settings.SITE_ROOT + pause_rel_url,
             "tags": self.tags,
+            "departments": self.departments,
             "timeout": int(self.timeout.total_seconds()),
             "grace": int(self.grace.total_seconds()),
             "nag": int(self.nag.total_seconds()),
             "n_pings": self.n_pings,
-            "status": self.get_status()
+            "status": self.get_status(),
+            "member_access_allowed": self.member_access_allowed
         }
 
         if self.last_ping:
@@ -166,6 +169,10 @@ class Check(models.Model):
             result["next_ping"] = None
 
         return result
+
+    @property
+    def priority_name(self):
+        return PO_PRIORITIES[self.priority]
 
 
 class Ping(models.Model):
@@ -220,6 +227,10 @@ class Channel(models.Model):
             return transports.Pushbullet(self)
         elif self.kind == "po":
             return transports.Pushover(self)
+        elif self.kind == "telegram":
+            return transports.Telegram(self)
+        elif self.kind == "sms":
+            return transports.Sms(self)
         else:
             raise NotImplementedError("Unknown channel kind: %s" % self.kind)
 

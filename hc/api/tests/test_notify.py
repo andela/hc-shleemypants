@@ -4,10 +4,10 @@ from django.core import mail
 from django.test import override_settings
 from hc.api.models import Channel, Check, Notification
 from hc.test import BaseTestCase
-from mock import patch
+from mock import patch, Mock
 from requests.exceptions import ConnectionError, Timeout
 
-
+from datetime import datetime, timedelta
 class NotifyTestCase(BaseTestCase):
 
     def _setup_data(self, kind, value, status="down", email_verified=True):
@@ -106,7 +106,7 @@ class NotifyTestCase(BaseTestCase):
         self._setup_data("email", "alice@example.org", email_verified=False)
         self.channel.notify(self.check)
 
-        assert Notification.objects.count() == 1
+        self.assertEqual(Notification.objects.count(), 1)
         n = Notification.objects.first()
         self.assertEqual(n.error, "Email not verified")
         self.assertEqual(len(mail.outbox), 0)
@@ -126,7 +126,7 @@ class NotifyTestCase(BaseTestCase):
         # access: the email should contain upgrade note
         message = mail.outbox[0]
         html, _ = message.alternatives[0]
-        assert "/pricing/" in html
+        self.assertIn("/pricing/", html)
 
     @patch("hc.api.transports.requests.request")
     def test_pd(self, mock_post):
@@ -134,7 +134,7 @@ class NotifyTestCase(BaseTestCase):
         mock_post.return_value.status_code = 200
 
         self.channel.notify(self.check)
-        assert Notification.objects.count() == 1
+        self.assertEqual(Notification.objects.count(), 1)
 
         args, kwargs = mock_post.call_args
         json = kwargs["json"]
@@ -146,7 +146,7 @@ class NotifyTestCase(BaseTestCase):
         mock_post.return_value.status_code = 200
 
         self.channel.notify(self.check)
-        assert Notification.objects.count() == 1
+        self.assertEqual(Notification.objects.count(), 1)
 
         args, kwargs = mock_post.call_args
         json = kwargs["json"]
@@ -161,7 +161,7 @@ class NotifyTestCase(BaseTestCase):
         mock_post.return_value.status_code = 200
 
         self.channel.notify(self.check)
-        assert Notification.objects.count() == 1
+        self.assertEqual(Notification.objects.count(), 1)
 
         args, kwargs = mock_post.call_args
         self.assertEqual(args[1], "123")
@@ -204,7 +204,7 @@ class NotifyTestCase(BaseTestCase):
         mock_post.return_value.status_code = 200
 
         self.channel.notify(self.check)
-        assert Notification.objects.count() == 1
+        self.assertEqual(Notification.objects.count(), 1)
 
         args, kwargs = mock_post.call_args
         json = kwargs["data"]
@@ -216,11 +216,32 @@ class NotifyTestCase(BaseTestCase):
         mock_post.return_value.status_code = 200
 
         self.channel.notify(self.check)
-        assert Notification.objects.count() == 1
+        self.assertEqual(Notification.objects.count(), 1)
 
         args, kwargs = mock_post.call_args
         json = kwargs["json"]
         self.assertEqual(json["message_type"], "CRITICAL")
+
+    @patch("hc.api.transports.requests.request")
+    def test_sms(self, mock_post):
+        self._setup_data("sms", "+254724820290")
+        mock_post.return_value.status_code = 200
+        date = datetime.now() - timedelta(days=1)
+
+        self.check.last_ping = datetime.strptime(str(date), "%Y-%m-%d %H:%M:%S.%f")
+        sms_mocker = Mock()
+        self.channel.notify(self.check)
+        self.assertEqual(Notification.objects.count(), 1)
+
+    @patch("hc.api.transports.requests.request")
+    def test_telegram(self, mock_post):
+        self._setup_data("telegram", "145644152")
+        mock_post.return_value.status_code = 200
+        date = datetime.now() - timedelta(days=1)
+        self.check.last_ping = datetime.strptime(str(date), "%Y-%m-%d %H:%M:%S.%f")
+        telegram_mocker = Mock()
+        self.channel.notify(self.check)
+        self.assertEqual(Notification.objects.count(), 1)
 
     ### Test that the web hooks handle connection errors and error 500s
     @patch("hc.api.transports.requests.request")
