@@ -1,2 +1,5 @@
-{{ check.name_then_code }} is {{ check.status }}
-
+{% if check.status == 'nag' %}
+{{ check.name_then_code }} is still down
+{% else %}
+  {{ check.name_then_code }} is {{ check.status }}
+{% endif %}

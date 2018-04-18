@@ -19,10 +19,14 @@ class Command(BaseCommand):
         query = Check.objects.filter(user__isnull=False).select_related("user")
 
         now = timezone.now()
+        # lt = less than & gt = greater than
         going_down = query.filter(alert_after__lt=now, status="up")
         going_up = query.filter(alert_after__gt=now, status="down")
+        often = query.filter(alert_after__lt=now, status="often")
+        nag_down = query.filter(nag_after__lt=now, status="down")
+        nag_up = query.filter(nag_after__gt=now, status="nag")
         # Don't combine this in one query so Postgres can query using index:
-        checks = list(going_down.iterator()) + list(going_up.iterator())
+        checks = list(going_down.iterator()) + list(going_up.iterator()) + list(nag_down.iterator()) + list(nag_up.iterator())
         if not checks:
             return False
 
@@ -43,6 +47,12 @@ class Command(BaseCommand):
         # Save the new status. If sendalerts crashes,
         # it won't process this check again.
         check.status = check.get_status()
+        if check.status == "down":
+            check.nag_after = time.now() + check.nag
+            check.status = "nag"
+        elif check.status == "nag":
+            check.nag_after = time.now() + check.nag
+            check.nag_after
         check.save()
 
         tmpl = "\nSending alert, status=%s, code=%s\n"
