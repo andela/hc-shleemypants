@@ -82,9 +82,7 @@ class Check(models.Model):
         return "%s@%s" % (self.code, settings.PING_EMAIL_DOMAIN)
 
     def send_alert(self):
-
         if self.status not in ("up", "down", "late", "often", "nag"):
-
             raise NotImplementedError("Unexpected status: %s" % self.status)
 
         errors = []
