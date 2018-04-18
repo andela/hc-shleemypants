@@ -18,15 +18,21 @@ class CheckModelTestCase(TestCase):
 
         check.tags = "     "
         self.assertEquals(check.tags_list(), [])
+ 
+        check.name = "";
+        self.assertFalse(check.name)
 
     def test_status_works_with_grace_period(self):
         check = Check()
 
         check.status = "up"
+
+        check.timeout = timedelta(days=1)
+        check.grace = timedelta(hours=1)
         check.last_ping = timezone.now() - timedelta(days=1, minutes=30)
 
         self.assertTrue(check.in_grace_period())
-        self.assertEqual(check.get_status(), "up")
+        self.assertEqual(check.get_status(), "late")
 
         ### The above 2 asserts fail. Make them pass
 
@@ -42,9 +48,11 @@ class CheckModelTestCase(TestCase):
 
     def test_new_check_is_not_in_grace_period(self):
         check = Check()
-
-        check.status = "up"
-        check.last_ping = timezone.now() 
+        check.status = "new"
+        
+        check.timeout = timedelta(days=1)
+        check.grace = timedelta(hours=1)
+        check.last_ping = timezone.now() - timedelta(days=1, minutes=30)
 
         self.assertFalse(check.in_grace_period())
 
